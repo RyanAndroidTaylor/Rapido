@@ -3,23 +3,21 @@ package com.dtp.samplemvp.common.database
 import android.content.ContentValues
 import android.database.Cursor
 import com.dtp.simplemvp.database.*
-import com.dtp.simplemvp.database.Column.Companion.UUID
-import com.dtp.simplemvp.database.Column.Companion.ID
-import com.dtp.simplemvp.database.Column.Companion.INT
-import com.dtp.simplemvp.database.Column.Companion.LONG
-import com.dtp.simplemvp.database.Column.Companion.STRING
+import com.dtp.simplemvp.database.table.Column.Companion.UUID
+import com.dtp.simplemvp.database.table.Column.Companion.ID
+import com.dtp.simplemvp.database.table.Column.Companion.INT
+import com.dtp.simplemvp.database.table.Column.Companion.LONG
+import com.dtp.simplemvp.database.table.Column.Companion.STRING
+import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
+import com.dtp.simplemvp.database.table.ChildDataTable
+import com.dtp.simplemvp.database.table.Column
 import com.dtp.simplemvp.get
 import com.dtp.simplemvp.put
 
 /**
  * Created by ryantaylor on 9/22/16.
  */
-data class Item(
-        val uuid: String,
-        val itemId: Long,
-        val condition: String,
-        val price: Int,
-        val photo: String): ChildDataTable {
+data class Item(val uuid: String, val itemId: Long, val condition: String, val price: Int, val photo: String): ChildDataTable {
 
     companion object {
         val TABLE_NAME = "Item"

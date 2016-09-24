@@ -1,7 +1,16 @@
 package com.dtp.simplemvp.database
 
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
+import com.dtp.simplemvp.database.item_builder.ItemBuilder
+import com.dtp.simplemvp.database.item_builder.ParentItemBuilder
+import com.dtp.simplemvp.database.query.Query
+import com.dtp.simplemvp.database.table.ChildDataTable
+import com.dtp.simplemvp.database.table.Column
+import com.dtp.simplemvp.database.table.DataTable
+import com.dtp.simplemvp.database.table.ParentDataTable
 import com.dtp.simplemvp.get
 import java.util.*
 
@@ -78,7 +87,6 @@ object DataConnection {
 
     fun <T> findFirst(builder: ItemBuilder<T>, query: Query): T? {
         val database = database
-        val children: List<ChildDataTable>?
 
         var item: T? = null
 
@@ -86,17 +94,7 @@ object DataConnection {
 
         if (cursor.moveToFirst()) {
             if (builder is ParentItemBuilder) {
-                val parentUuid = cursor.get<String>(Column.UUID)
-
-                children = ArrayList<ChildDataTable>()
-
-                val childrenBuilderData = builder.getChildBuilders()
-
-                for (buildData in childrenBuilderData) {
-                    children.addAll(findAllChildren(database, buildData.first, buildData.second, parentUuid))
-                }
-
-                item = builder.buildItem(cursor, children)
+                item = buildParentWithCursor(builder, cursor)
             } else {
                 item = builder.buildItem(cursor)
             }
@@ -112,12 +110,32 @@ object DataConnection {
 
         val cursor = database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
 
-        while (cursor.moveToNext())
-            items.add(builder.buildItem(cursor))
+        if (builder is ParentItemBuilder) {
+            while (cursor.moveToNext())
+                buildParentWithCursor(builder, cursor)
+        } else {
+            while (cursor.moveToNext())
+                items.add(builder.buildItem(cursor))
+        }
 
         cursor.close()
 
         return items
+    }
+
+    private fun <T> buildParentWithCursor(builder: ParentItemBuilder<T>, cursor: Cursor): T {
+        val children: List<ChildDataTable>?
+        val parentUuid = cursor.get<String>(Column.UUID)
+
+        children = ArrayList<ChildDataTable>()
+
+        val childrenBuilderData = builder.getChildBuilders()
+
+        for (buildData in childrenBuilderData) {
+            children.addAll(findAllChildren(database, buildData.first, buildData.second, parentUuid))
+        }
+
+        return builder.buildItem(cursor, children)
     }
 
     private fun findAllChildren(database: SQLiteDatabase, tableName: String, builder: ChildItemBuilder, parentUuid: String): List<ChildDataTable> {

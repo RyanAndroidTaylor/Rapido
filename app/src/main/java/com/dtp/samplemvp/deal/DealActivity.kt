@@ -7,7 +7,7 @@ import android.util.Log
 import com.dtp.samplemvp.R
 import com.dtp.samplemvp.common.database.Item
 import com.dtp.simplemvp.database.DataConnection
-import com.dtp.simplemvp.database.QueryBuilder
+import com.dtp.simplemvp.database.query.QueryBuilder
 
 class DealActivity : AppCompatActivity() {
 
@@ -25,9 +25,7 @@ class DealActivity : AppCompatActivity() {
 
         val loadedItems = DataConnection.findAll(Item.BUILDER, query)
 
-        loadedItems?.let {
-            for (item in it)
-                Log.i("DealActivity", item.toString())
-        }
+        for (item in loadedItems)
+            Log.i("DealActivity", item.toString())
     }
 }

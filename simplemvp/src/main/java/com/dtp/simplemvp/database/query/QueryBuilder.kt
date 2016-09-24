@@ -1,6 +1,7 @@
-package com.dtp.simplemvp.database
+package com.dtp.simplemvp.database.query
 
-import com.dtp.simplemvp.database.Column
+import com.dtp.simplemvp.database.table.Column
+import com.dtp.simplemvp.database.query.Query
 import java.util.*
 
 /**

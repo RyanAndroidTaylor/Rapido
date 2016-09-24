@@ -2,12 +2,11 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.simplemvp.database.ChildDataTable
-import com.dtp.simplemvp.database.ChildItemBuilder
-import com.dtp.simplemvp.database.Column
-import com.dtp.simplemvp.database.Column.Companion.STRING
-import com.dtp.simplemvp.database.Column.Companion.INT
-import com.dtp.simplemvp.database.ItemBuilder
+import com.dtp.simplemvp.database.table.ChildDataTable
+import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
+import com.dtp.simplemvp.database.table.Column
+import com.dtp.simplemvp.database.table.Column.Companion.STRING
+import com.dtp.simplemvp.database.table.Column.Companion.INT
 import com.dtp.simplemvp.get
 import com.dtp.simplemvp.put
 
@@ -48,7 +47,7 @@ data class Topic(val id: String, val commentCount: Int, val createdAt: String, v
         return contentValues
     }
 
-    class Builder: ChildItemBuilder {
+    class Builder : ChildItemBuilder {
         override fun buildItem(cursor: Cursor): Topic {
             return Topic(cursor.get(TOPIC_ID), cursor.get(COMMENT_COUNT), cursor.get(CREATED_AT), cursor.get(REPLY_COUNT), cursor.get(URL), cursor.get(VOTE_COUNT))
         }

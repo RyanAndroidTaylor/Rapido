@@ -2,12 +2,11 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.simplemvp.database.ChildDataTable
-import com.dtp.simplemvp.database.ChildItemBuilder
-import com.dtp.simplemvp.database.Column
-import com.dtp.simplemvp.database.Column.Companion.STRING
+import com.dtp.simplemvp.database.table.ChildDataTable
+import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
+import com.dtp.simplemvp.database.table.Column
+import com.dtp.simplemvp.database.table.Column.Companion.STRING
 
-import com.dtp.simplemvp.database.ItemBuilder
 import com.dtp.simplemvp.get
 import com.dtp.simplemvp.put
 

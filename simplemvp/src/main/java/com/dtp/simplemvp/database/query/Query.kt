@@ -1,4 +1,4 @@
-package com.dtp.simplemvp.database
+package com.dtp.simplemvp.database.query
 
 /**
  * Created by ryantaylor on 9/22/16.

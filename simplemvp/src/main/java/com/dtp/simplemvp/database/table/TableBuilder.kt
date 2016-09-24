@@ -1,12 +1,13 @@
-package com.dtp.simplemvp.database
+package com.dtp.simplemvp.database.table
 
+import com.dtp.simplemvp.database.table.Column
 import java.util.*
 
-import com.dtp.simplemvp.database.Column.Companion.NOT_NULL
-import com.dtp.simplemvp.database.Column.Companion.REFERENCES
-import com.dtp.simplemvp.database.Column.Companion.UNIQUE
-import com.dtp.simplemvp.database.Column.Companion.ID
-import com.dtp.simplemvp.database.Column.Companion.UUID
+import com.dtp.simplemvp.database.table.Column.Companion.NOT_NULL
+import com.dtp.simplemvp.database.table.Column.Companion.REFERENCES
+import com.dtp.simplemvp.database.table.Column.Companion.UNIQUE
+import com.dtp.simplemvp.database.table.Column.Companion.ID
+import com.dtp.simplemvp.database.table.Column.Companion.UUID
 
 /**
  * Created by ryantaylor on 9/23/16.

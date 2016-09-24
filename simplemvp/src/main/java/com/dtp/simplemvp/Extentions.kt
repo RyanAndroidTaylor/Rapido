@@ -2,7 +2,7 @@ package com.dtp.simplemvp
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.simplemvp.database.Column
+import com.dtp.simplemvp.database.table.Column
 
 /**
  * Created by ryantaylor on 9/23/16.

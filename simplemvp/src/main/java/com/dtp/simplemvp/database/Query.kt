@@ -1,4 +1,4 @@
-package com.dtp.simplemvp
+package com.dtp.simplemvp.database
 
 /**
  * Created by ryantaylor on 9/22/16.

@@ -1,4 +1,4 @@
-package com.dtp.simplemvp
+package com.dtp.simplemvp.database
 
 import android.content.ContentValues
 

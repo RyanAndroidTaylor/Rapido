@@ -1,5 +1,6 @@
-package com.dtp.simplemvp
+package com.dtp.simplemvp.database
 
+import com.dtp.simplemvp.database.Column
 import java.util.*
 
 /**

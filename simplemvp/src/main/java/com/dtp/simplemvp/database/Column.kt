@@ -1,0 +1,22 @@
+package com.dtp.simplemvp.database
+
+/**
+ * Created by ryantaylor on 9/22/16.
+ */
+class Column(val type: Any, val name: String, val notNull: Boolean = false, val unique: Boolean = false) {
+
+    companion object {
+        //TYPE
+        val INT = 1
+        val STRING = ""
+        val LONG = 1L
+
+        // Constrains
+        val NOT_NULL = "NOT NULL"
+        val REFERENCES = "REFERENCES "
+        val UNIQUE = "UNIQUE"
+
+        val ID = Column(INT, "_id")
+        val UUID = Column(STRING, "uuid")
+    }
+}

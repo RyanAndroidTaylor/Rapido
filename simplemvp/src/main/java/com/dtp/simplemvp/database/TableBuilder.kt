@@ -1,24 +1,26 @@
-package com.dtp.simplemvp
+package com.dtp.simplemvp.database
 
 import java.util.*
 
-import com.dtp.simplemvp.Column.Companion.TEXT
-import com.dtp.simplemvp.Column.Companion.INTEGER
-import com.dtp.simplemvp.Column.Companion.BOOLEAN
-import com.dtp.simplemvp.Column.Companion.BLOB
-import com.dtp.simplemvp.Column.Companion.NOT_NULL
-import com.dtp.simplemvp.Column.Companion.REFERENCES
-import com.dtp.simplemvp.Column.Companion.UNIQUE
-import com.dtp.simplemvp.Column.Companion.ID
-import com.dtp.simplemvp.Column.Companion.UUID
+import com.dtp.simplemvp.database.Column.Companion.NOT_NULL
+import com.dtp.simplemvp.database.Column.Companion.REFERENCES
+import com.dtp.simplemvp.database.Column.Companion.UNIQUE
+import com.dtp.simplemvp.database.Column.Companion.ID
+import com.dtp.simplemvp.database.Column.Companion.UUID
 
 /**
  * Created by ryantaylor on 9/23/16.
  */
 class TableBuilder {
 
+    // Types
+    val TEXT = "TEXT"
+    val INTEGER = "INTEGER"
+    val BOOLEAN = "INTEGER"
+    val BLOB = "BLOB"
+
     private val SPACE = " "
-    private val PERIOD = "."
+    private val PERIOD = ""
     private val COMMA = ","
 
     private var createString = StringBuilder()
@@ -30,7 +32,7 @@ class TableBuilder {
     private var columns = ArrayList<String>()
 
     fun buildTable(tableName: String, columns: Array<Column>): String {
-        open(tableName)
+        open(tableName, columns.contains(UUID))
 
         for (column in columns) {
             val columnBuilder = getColumnBuilder(column)
@@ -48,15 +50,15 @@ class TableBuilder {
 
     private fun getColumnBuilder(column: Column): ColumnBuilder {
         when (column.type) {
-            TEXT -> return buildTextColumn(column.name)
-            INTEGER -> return buildIntColumn(column.name)
-            BOOLEAN -> return buildBooleanColumn(column.name)
-            BLOB -> return buildBlobColumn(column.name)
+            is String -> return buildTextColumn(column.name)
+            is Int -> return buildIntColumn(column.name)
+            is Boolean -> return buildBooleanColumn(column.name)
+            is Any -> return buildBlobColumn(column.name)
             else -> throw UnsupportedOperationException("No ColumnBuilder found for type ${column.type}")
         }
     }
 
-    private fun open(tableName: String): String {
+    private fun open(tableName: String, uuid: Boolean = false): String {
         prepareNewTable(tableName)
 
         createString.append("CREATE TABLE ")
@@ -64,46 +66,51 @@ class TableBuilder {
         createString.append(" ( ")
         createString.append(ID.name)
         createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
-        createString.append(UUID.name)
-        createString.append(SPACE)
-        createString.append(TEXT)
-        createString.append(SPACE)
-        createString.append(NOT_NULL)
-        createString.append(SPACE)
-        createString.append(UNIQUE)
+
+        if (uuid) {
+            createString.append(UUID.name)
+            createString.append(SPACE)
+            createString.append(TEXT)
+            createString.append(SPACE)
+            createString.append(NOT_NULL)
+            createString.append(SPACE)
+            createString.append(UNIQUE)
+        }
 
         columns.add(currentTable + PERIOD + ID.name)
-        columns.add(currentTable + PERIOD + UUID.name)
+
+        if (uuid)
+            columns.add(currentTable + PERIOD + UUID.name)
 
         return tableName
     }
 
-    private fun openWithUuidForeignKeyRestraint(tableName: String, referenceTable: String): String {
-        prepareNewTable(tableName)
-
-        createString.append("CREATE TABLE ")
-        createString.append(currentTable)
-        createString.append(" ( ")
-        createString.append(ID.name)
-        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
-        createString.append(UUID.name)
-        createString.append(SPACE)
-        createString.append(TEXT)
-        createString.append(SPACE)
-        createString.append(NOT_NULL)
-        createString.append(SPACE)
-        createString.append(UNIQUE)
-        createString.append(" REFERENCES ")
-        createString.append(referenceTable)
-        createString.append("(")
-        createString.append(UUID.name)
-        createString.append(")")
-
-        columns.add(currentTable + PERIOD + ID.name)
-        columns.add(currentTable + PERIOD + UUID.name)
-
-        return tableName
-    }
+//    private fun openWithUuidForeignKeyRestraint(tableName: String, referenceTable: String): String {
+//        prepareNewTable(tableName)
+//
+//        createString.append("CREATE TABLE ")
+//        createString.append(currentTable)
+//        createString.append(" ( ")
+//        createString.append(ID.name)
+//        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+//        createString.append(UUID.name)
+//        createString.append(SPACE)
+//        createString.append(TEXT)
+//        createString.append(SPACE)
+//        createString.append(NOT_NULL)
+//        createString.append(SPACE)
+//        createString.append(UNIQUE)
+//        createString.append(" REFERENCES ")
+//        createString.append(referenceTable)
+//        createString.append("(")
+//        createString.append(UUID.name)
+//        createString.append(")")
+//
+//        columns.add(currentTable + PERIOD + ID.name)
+//        columns.add(currentTable + PERIOD + UUID.name)
+//
+//        return tableName
+//    }
 
     private fun prepareNewTable(tableName: String) {
         createString = StringBuilder()
@@ -197,7 +204,7 @@ class TableBuilder {
         }
 
         fun unique(): ColumnBuilder {
-            constraints.add(" $UNIQUE")
+            constraints.add(" ${UNIQUE}")
 
             return this
         }

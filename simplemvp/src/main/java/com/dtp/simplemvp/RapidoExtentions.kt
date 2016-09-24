@@ -23,9 +23,14 @@ fun ContentValues.put(column: Column, value: Any) {
         is Int -> put(column.name, value as Int)
         is Long -> put(column.name, value as Long)
         is Boolean -> put(column.name, value as Boolean)
+        else -> throw IllegalArgumentException("${column.type} not supported by this method")
     }
 }
 
+/**
+ * Returns content values where the values are stored base on the colulmns name.
+ * The columns and values must be in the same order.
+ */
 fun ContentValues.get(columns: Array<Column>, values: Array<Any>): ContentValues {
     for ((index, column) in columns.withIndex()) {
         val value = values[index]
@@ -34,6 +39,7 @@ fun ContentValues.get(columns: Array<Column>, values: Array<Any>): ContentValues
             is Int -> put(column.name, value as Int)
             is Long -> put(column.name, value as Long)
             is Boolean -> put(column.name, value as Boolean)
+            else -> throw IllegalArgumentException("${column.type} not supported by this method")
         }
     }
 

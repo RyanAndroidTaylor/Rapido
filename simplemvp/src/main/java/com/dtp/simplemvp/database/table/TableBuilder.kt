@@ -66,9 +66,10 @@ class TableBuilder {
         createString.append(currentTable)
         createString.append(" ( ")
         createString.append(ID.name)
-        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT")
 
         if (uuid) {
+            createString.append(",")
             createString.append(UUID.name)
             createString.append(SPACE)
             createString.append(TEXT)

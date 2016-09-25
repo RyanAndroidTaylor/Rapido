@@ -21,7 +21,7 @@ class DealActivity : AppCompatActivity() {
 
         DataConnection.saveAll(listOf(itemOne, itemTwo, itemThree))
 
-        val query = QueryBuilder().select(Item.COLUMNS).from(Item.TABLE_NAME).where(Item.ITEM_ID).lessThan("3").build()
+        val query = QueryBuilder().select(Item.COLUMNS).from(Item.TABLE_NAME).descending(Item.ITEM_ID).build()
 
         val loadedItems = DataConnection.findAll(Item.BUILDER, query)
 

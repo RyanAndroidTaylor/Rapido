@@ -96,15 +96,15 @@ class QueryBuilder {
         return this
     }
 
-    fun ascending(): QueryBuilder {
-        this.order = ASCENDING
+    fun ascending(column: Column): QueryBuilder {
+        this.order = "${column.name} $ASCENDING"
 
         return this
     }
 
-    fun descending(): QueryBuilder {
-        this.order = DESENDING
-        
+    fun descending(column: Column): QueryBuilder {
+        this.order = "${column.name} $DESENDING"
+
         return this
     }
 

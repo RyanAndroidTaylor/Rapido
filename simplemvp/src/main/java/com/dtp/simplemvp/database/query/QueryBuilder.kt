@@ -15,6 +15,8 @@ class QueryBuilder {
     private val GREATER_THAN_OR_EQUAL = " >=? "
     private val OR = " OR "
     private val AND = " AND "
+    private val ASCENDING = "ASC"
+    private val DESENDING = "DESC"
 
     private var tableName: String? = null
     private var columns: Array<String>? = null
@@ -90,6 +92,24 @@ class QueryBuilder {
     fun and(column: Column): QueryBuilder {
         whereCombinds.add(AND)
         whereColumns.add(column.name)
+
+        return this
+    }
+
+    fun ascending(): QueryBuilder {
+        this.order = ASCENDING
+
+        return this
+    }
+
+    fun descending(): QueryBuilder {
+        this.order = DESENDING
+        
+        return this
+    }
+
+    fun limit(limit: Int): QueryBuilder {
+        this.limit = limit.toString()
 
         return this
     }

@@ -11,21 +11,34 @@ abstract class BasePresenter<T: State> : Presenter<T> {
     override fun load(presenterData: PresenterData?) {
         if (presenterData != null) {
             state = presenterData.loadState(stateKey)
+
+            loadFromSavedState()
         } else if (StateManager.hasState(stateKey)) {
             state = StateManager.getState(stateKey)
+
+            loadFromSavedState()
         } else {
             state = newState()
             StateManager.addState(stateKey, state)
-        }
 
-        onStateLoaded()
+            load()
+        }
     }
 
     /**
-     * Called once the state has been loaded. The state can be a new state or loaded from the presenterData or StateManager
-     * This is where you should handle the loading logic of your presenter.
+     * Called when the presenter is loaded and there is not any saved state to load
      */
-    abstract fun onStateLoaded()
+    protected abstract fun load()
+
+    /**
+     * Called when loading from the state saved in StateManager.
+     */
+    protected abstract fun loadFromState()
+
+    /**
+     * Called when loading from savedInstanceState. The activity has been destroyed and recreated by the system
+     */
+    protected abstract fun loadFromSavedState()
 
     override fun saveState(presenterData: PresenterData) {
         presenterData.saveState(stateKey, state)

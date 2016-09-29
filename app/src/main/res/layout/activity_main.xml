@@ -11,7 +11,15 @@
     tools:context="com.dtp.samplemvp.deal.DealActivity">
 
     <TextView
+        android:id="@+id/text_place"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Wrong!!!" />
+
+    <Button
+        android:id="@+id/click"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Click"/>
 </RelativeLayout>

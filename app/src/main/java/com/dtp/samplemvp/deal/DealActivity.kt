@@ -9,6 +9,7 @@ import com.dtp.samplemvp.R
 import com.dtp.samplemvp.common.database.Item
 import com.dtp.simplemvp.database.DataConnection
 import com.dtp.simplemvp.database.query.QueryBuilder
+import kotlinx.android.synthetic.main.activity_main.*
 
 class DealActivity : AppCompatActivity(), DealView {
 
@@ -21,9 +22,15 @@ class DealActivity : AppCompatActivity(), DealView {
         dealPresenter = DealPresenter(this)
 
         dealPresenter.load()
+
+        click.setOnClickListener { dealPresenter.setNewText("Correct text") }
     }
 
     override fun displayError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun displayNewText(text: String) {
+        text_place.text = text
     }
 }

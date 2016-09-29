@@ -6,4 +6,6 @@ package com.dtp.samplemvp.deal
 interface DealView {
 
     fun displayError(message: String)
+
+    fun displayNewText(text: String)
 }

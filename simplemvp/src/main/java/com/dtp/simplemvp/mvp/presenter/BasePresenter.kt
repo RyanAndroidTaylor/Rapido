@@ -2,11 +2,12 @@ package com.dtp.simplemvp.mvp.presenter
 
 import com.dtp.simplemvp.mvp.state.State
 import com.dtp.simplemvp.mvp.state.StateManager
+import com.dtp.simplemvp.mvp.view.ViewLayer
 
 /**
  * Created by ryantaylor on 9/26/16.
  */
-abstract class BasePresenter<T: State> : Presenter<T> {
+abstract class BaseStatePresenter<T: State, out V: ViewLayer>(val view: V) : StatePresenter<T> {
 
     override fun load(presenterData: PresenterData?) {
         if (presenterData != null) {
@@ -24,11 +25,6 @@ abstract class BasePresenter<T: State> : Presenter<T> {
             load()
         }
     }
-
-    /**
-     * Called when the presenter is loaded and there is not any saved state to load
-     */
-    protected abstract fun load()
 
     /**
      * Called when loading from the state saved in StateManager.

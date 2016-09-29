@@ -9,7 +9,7 @@ import com.dtp.simplemvp.mvp.presenter.BasePresenter
 /**
  * Created by ryantaylor on 9/22/16.
  */
-class DealPresenter(val view: DealView) : BasePresenter<DealState>(){
+class DealPresenter(view: DealView) : BasePresenter<DealState, DealView>(view){
     override var stateKey = "DealState"
     override lateinit var state: DealState
 

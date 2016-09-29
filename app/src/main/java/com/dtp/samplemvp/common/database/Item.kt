@@ -2,6 +2,7 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
+import com.dtp.simplemvp.addAll
 import com.dtp.simplemvp.database.*
 import com.dtp.simplemvp.database.table.Column.Companion.UUID
 import com.dtp.simplemvp.database.table.Column.Companion.ID
@@ -12,7 +13,6 @@ import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
 import com.dtp.simplemvp.database.table.ChildDataTable
 import com.dtp.simplemvp.database.table.Column
 import com.dtp.simplemvp.get
-import com.dtp.simplemvp.put
 
 /**
  * Created by ryantaylor on 9/22/16.
@@ -36,15 +36,7 @@ data class Item(val uuid: String, val itemId: Long, val condition: String, val p
     }
 
     override fun contentValues(): ContentValues {
-        val contentValues = ContentValues()
-
-        contentValues.put(UUID, uuid)
-        contentValues.put(ITEM_ID, itemId)
-        contentValues.put(CONDITION, condition)
-        contentValues.put(PRICE, price)
-        contentValues.put(PHOTO, photo)
-
-        return contentValues
+        return ContentValues().addAll(COLUMNS, arrayOf(itemId, uuid, condition, price, photo))
     }
 
     class Builder: ChildItemBuilder {

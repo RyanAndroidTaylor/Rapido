@@ -2,13 +2,13 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
+import com.dtp.simplemvp.addAll
 import com.dtp.simplemvp.database.table.ChildDataTable
 import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
 import com.dtp.simplemvp.database.table.Column
 import com.dtp.simplemvp.database.table.Column.Companion.STRING
 
 import com.dtp.simplemvp.get
-import com.dtp.simplemvp.put
 
 /**
  * Created by ryantaylor on 9/23/16.
@@ -32,14 +32,7 @@ data class Theme(val accentColor: String, val backgroundColor: String, val backg
     }
 
     override fun contentValues(): ContentValues {
-        val contentValues = ContentValues()
-
-        contentValues.put(ACCENT_COLOR, accentColor)
-        contentValues.put(BACKGROUND_COLOR, backgroundColor)
-        contentValues.put(BACKGROUND_IMAGE, backgroundImage)
-        contentValues.put(FOREGROUND, foreground)
-
-        return contentValues
+        return ContentValues().addAll(COLUMNS, arrayOf(accentColor, backgroundColor, backgroundImage, foreground))
     }
 
     class Builder: ChildItemBuilder {

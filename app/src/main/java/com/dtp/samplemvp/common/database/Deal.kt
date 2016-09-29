@@ -2,15 +2,14 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.simplemvp.database.*
 import com.dtp.simplemvp.database.table.Column.Companion.STRING
 import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
 import com.dtp.simplemvp.database.item_builder.ParentItemBuilder
 import com.dtp.simplemvp.database.table.ChildDataTable
 import com.dtp.simplemvp.database.table.Column
 import com.dtp.simplemvp.database.table.ParentDataTable
+import com.dtp.simplemvp.addAll
 import com.dtp.simplemvp.get
-import com.dtp.simplemvp.put
 import java.util.*
 
 /**
@@ -47,15 +46,7 @@ class Deal(
     }
 
     override fun contentValues(): ContentValues {
-        val contentValues = ContentValues()
-
-        contentValues.put(FEATURES, features)
-        contentValues.put(DEAL_ID, id)
-        contentValues.put(TITLE, title)
-        contentValues.put(STORY, story)
-        contentValues.put(URL, url)
-
-        return contentValues
+        return ContentValues().addAll(COLUMNS, arrayOf(features, id, title, story, url))
     }
 
     override fun getChildren(): List<ChildDataTable> {

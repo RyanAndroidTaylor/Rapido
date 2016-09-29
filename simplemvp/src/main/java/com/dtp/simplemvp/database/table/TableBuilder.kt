@@ -87,32 +87,32 @@ class TableBuilder {
         return tableName
     }
 
-//    private fun openWithUuidForeignKeyRestraint(tableName: String, referenceTable: String): String {
-//        prepareNewTable(tableName)
-//
-//        createString.append("CREATE TABLE ")
-//        createString.append(currentTable)
-//        createString.append(" ( ")
-//        createString.append(ID.name)
-//        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
-//        createString.append(UUID.name)
-//        createString.append(SPACE)
-//        createString.append(TEXT)
-//        createString.append(SPACE)
-//        createString.append(NOT_NULL)
-//        createString.append(SPACE)
-//        createString.append(UNIQUE)
-//        createString.append(" REFERENCES ")
-//        createString.append(referenceTable)
-//        createString.append("(")
-//        createString.append(UUID.name)
-//        createString.append(")")
-//
-//        columns.add(currentTable + PERIOD + ID.name)
-//        columns.add(currentTable + PERIOD + UUID.name)
-//
-//        return tableName
-//    }
+    private fun openWithUuidForeignKeyRestraint(tableName: String, referenceTable: String): String {
+        prepareNewTable(tableName)
+
+        createString.append("CREATE TABLE ")
+        createString.append(currentTable)
+        createString.append(" ( ")
+        createString.append(ID.name)
+        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+        createString.append(UUID.name)
+        createString.append(SPACE)
+        createString.append(TEXT)
+        createString.append(SPACE)
+        createString.append(NOT_NULL)
+        createString.append(SPACE)
+        createString.append(UNIQUE)
+        createString.append(" REFERENCES ")
+        createString.append(referenceTable)
+        createString.append("(")
+        createString.append(UUID.name)
+        createString.append(")")
+
+        columns.add(currentTable + PERIOD + ID.name)
+        columns.add(currentTable + PERIOD + UUID.name)
+
+        return tableName
+    }
 
     private fun prepareNewTable(tableName: String) {
         createString = StringBuilder()
@@ -206,7 +206,7 @@ class TableBuilder {
         }
 
         fun unique(): ColumnBuilder {
-            constraints.add(" ${UNIQUE}")
+            constraints.add(" $UNIQUE")
 
             return this
         }

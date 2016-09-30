@@ -3,7 +3,6 @@ package com.dtp.samplemvp.common.database
 import android.content.ContentValues
 import android.database.Cursor
 import com.dtp.simplemvp.addAll
-import com.dtp.simplemvp.database.*
 import com.dtp.simplemvp.database.table.Column.Companion.UUID
 import com.dtp.simplemvp.database.table.Column.Companion.ID
 import com.dtp.simplemvp.database.table.Column.Companion.INT

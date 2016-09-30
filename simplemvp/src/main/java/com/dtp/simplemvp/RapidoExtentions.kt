@@ -24,12 +24,14 @@ fun <T> Cursor.get(column: Column): T {
 fun ContentValues.addAll(columns: Array<Column>, values: Array<Any?>): ContentValues {
     for ((index, column) in columns.withIndex()) {
         val value = values[index]
-        when (column.type) {
-            is String -> put(column.name, value as String)
-            is Int -> put(column.name, value as Int)
-            is Long -> put(column.name, value as Long)
-            is Boolean -> put(column.name, value as Boolean)
-            else -> throw IllegalArgumentException("${column.type} not supported by this method")
+        if (value != null) {
+            when (column.type) {
+                is String -> put(column.name, value as String)
+                is Int -> put(column.name, value as Int)
+                is Long -> put(column.name, value as Long)
+                is Boolean -> put(column.name, value as Boolean)
+                else -> throw IllegalArgumentException("${column.type} not supported by this method")
+            }
         }
     }
 

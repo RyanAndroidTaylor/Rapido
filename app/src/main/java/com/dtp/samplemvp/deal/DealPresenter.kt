@@ -1,5 +1,6 @@
 package com.dtp.samplemvp.deal
 
+import android.util.Log
 import com.dtp.samplemvp.common.BaseCallback
 import com.dtp.samplemvp.common.database.Deal
 import com.dtp.samplemvp.common.network.DealService
@@ -8,7 +9,7 @@ import com.dtp.simplemvp.mvp.presenter.BasePresenter
 /**
  * Created by ryantaylor on 9/22/16.
  */
-class DealPresenter(val view: DealView) : BasePresenter<DealState>(){
+class DealPresenter(view: DealView) : BasePresenter<DealState, DealView>(view){
     override var stateKey = "DealState"
     override lateinit var state: DealState
 
@@ -18,7 +19,33 @@ class DealPresenter(val view: DealView) : BasePresenter<DealState>(){
         return DealState()
     }
 
-    override fun onStateLoaded() {
+    override fun load() {
+        Log.i("DealPresenter", "Loading new state")
+
+        getDeals()
+    }
+
+    override fun loadFromState() {
+        Log.i("DealPresenter", "Loading from state")
+        getDeals()
+
+        state.newText?.let { view.displayNewText(it) }
+    }
+
+    override fun loadFromSavedState() {
+        Log.i("DealPresenter", "Loading from saved state")
+        getDeals()
+
+        state.newText?.let { view.displayNewText(it) }
+    }
+
+    fun setNewText(text: String) {
+        state.newText = text
+
+        view.displayNewText(text)
+    }
+
+    private fun getDeals() {
         dealService.getDeal(object : BaseCallback<Deal> {
             override fun failed(message: String?) {
                 message?.let { view.displayError(it) }
@@ -28,5 +55,9 @@ class DealPresenter(val view: DealView) : BasePresenter<DealState>(){
 
             }
         })
+    }
+
+    private fun loadNewText() {
+
     }
 }

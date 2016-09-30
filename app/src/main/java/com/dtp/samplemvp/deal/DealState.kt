@@ -7,7 +7,7 @@ import com.dtp.simplemvp.mvp.state.State
 /**
  * Created by ryantaylor on 9/26/16.
  */
- class DealState() : State {
+data class DealState(var newText: String? = null) : State {
 
     companion object {
         @JvmStatic
@@ -16,19 +16,19 @@ import com.dtp.simplemvp.mvp.state.State
                 return arrayOfNulls(size)
             }
 
-            override fun createFromParcel(source: Parcel?): DealState {
+            override fun createFromParcel(source: Parcel): DealState {
                 return DealState(source)
             }
 
         }
     }
 
-    constructor(source: Parcel?) : this() {
-
+    constructor(source: Parcel) : this() {
+        newText = source.readString()
     }
 
-    override fun writeToParcel(dest: Parcel?, flags: Int) {
-
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(newText)
     }
 
     override fun describeContents(): Int {

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Rapido.iml" filepath="$PROJECT_DIR$/Rapido.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SampleMvp.iml" filepath="$PROJECT_DIR$/SampleMvp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/simplemvp/simplemvp.iml" filepath="$PROJECT_DIR$/simplemvp/simplemvp.iml" />
     </modules>

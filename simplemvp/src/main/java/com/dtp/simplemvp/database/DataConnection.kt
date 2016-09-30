@@ -123,6 +123,10 @@ object DataConnection {
         return items
     }
 
+    fun getCursor(query: Query): Cursor {
+        return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
+    }
+
     private fun <T> buildParentWithCursor(builder: ParentItemBuilder<T>, cursor: Cursor): T {
         val children: List<ChildDataTable>?
         val parentUuid = cursor.get<String>(Column.UUID)

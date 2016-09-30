@@ -36,6 +36,9 @@ class TableBuilder {
         open(tableName, columns.contains(UUID))
 
         for (column in columns) {
+            if (column.name == UUID.name || column.name == ID.name)
+                continue
+
             val columnBuilder = getColumnBuilder(column)
 
             if (column.notNull)

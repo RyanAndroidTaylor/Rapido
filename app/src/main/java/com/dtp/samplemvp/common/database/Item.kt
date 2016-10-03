@@ -25,7 +25,7 @@ data class Item(val uuid: String, val itemId: Long, val condition: String, val p
         val PRICE = Column(INT, "Price")
         val PHOTO = Column(STRING, "Photo")
 
-        val COLUMNS = arrayOf(ID, UUID, ITEM_ID, CONDITION, PRICE, PHOTO)
+        val COLUMNS = arrayOf(UUID, ITEM_ID, CONDITION, PRICE, PHOTO)
 
         val BUILDER = Builder()
     }
@@ -35,7 +35,7 @@ data class Item(val uuid: String, val itemId: Long, val condition: String, val p
     }
 
     override fun contentValues(): ContentValues {
-        return ContentValues().addAll(COLUMNS, arrayOf(itemId, uuid, condition, price, photo))
+        return ContentValues().addAll(COLUMNS, arrayOf(uuid, itemId, condition, price, photo))
     }
 
     class Builder: ChildItemBuilder {

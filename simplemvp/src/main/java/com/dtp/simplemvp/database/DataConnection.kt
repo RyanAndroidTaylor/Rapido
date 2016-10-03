@@ -1,5 +1,6 @@
 package com.dtp.simplemvp.database
 
+import android.content.ClipData
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -12,7 +13,11 @@ import com.dtp.simplemvp.database.table.Column
 import com.dtp.simplemvp.database.table.DataTable
 import com.dtp.simplemvp.database.table.ParentDataTable
 import com.dtp.simplemvp.get
+import com.jakewharton.rx.transformer.ReplayingShare
+import rx.Observable
+import rx.subjects.PublishSubject
 import java.util.*
+import javax.security.auth.Subject
 
 /**
  * Created by ryantaylor on 9/22/16.
@@ -26,11 +31,29 @@ object DataConnection {
     private val database: SQLiteDatabase
         get() = sqliteOpenHelper.writableDatabase
 
+    private val subjects = HashMap<String, PublishSubject<out DataTable>>()
+    private val replayShareObservable = HashMap<String, Observable<out DataTable>>()
+
     fun init(databaseHelper: SQLiteOpenHelper) {
         this.sqliteOpenHelper = databaseHelper
     }
 
-    fun save(item: DataTable) {
+    @Suppress("UNCHECKED_CAST")
+    fun <T: DataTable> watchTable(tableName: String): Observable<T> {
+        if (!subjects.containsKey(tableName)) {
+            val subject = PublishSubject.create<T>()
+
+            subjects.put(tableName, subject)
+
+            val observable = subject.compose(ReplayingShare.instance<T>())
+
+            replayShareObservable.put(tableName, observable)
+        }
+
+        return replayShareObservable[tableName] as Observable<T>
+    }
+
+    fun <T: DataTable> save(item: DataTable) {
         val database = database
 
         if (item is ParentDataTable) {
@@ -40,7 +63,12 @@ object DataConnection {
                 database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
         }
 
-        database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
+        val id = database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
+
+        if (id > -1) {
+            @Suppress("UNCHECKED_CAST")
+            (subjects[item.tableName()] as PublishSubject<T>).onNext(item as T)
+        }
     }
 
     fun saveAll(items: List<DataTable>) {

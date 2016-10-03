@@ -4,12 +4,12 @@ import android.util.Log
 import com.dtp.samplemvp.common.BaseCallback
 import com.dtp.samplemvp.common.database.Deal
 import com.dtp.samplemvp.common.network.DealService
-import com.dtp.simplemvp.mvp.presenter.BasePresenter
+import com.dtp.simplemvp.mvp.presenter.BaseStatePresenter
 
 /**
  * Created by ryantaylor on 9/22/16.
  */
-class DealPresenter(view: DealView) : BasePresenter<DealState, DealView>(view){
+class DealPresenter(view: DealView) : BaseStatePresenter<DealState, DealView>(view){
     override var stateKey = "DealState"
     override lateinit var state: DealState
 

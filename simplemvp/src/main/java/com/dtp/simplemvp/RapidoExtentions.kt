@@ -13,6 +13,7 @@ fun <T> Cursor.get(column: Column): T {
         is String -> return getString(getColumnIndex(column.name)) as T
         is Int -> return getInt(getColumnIndex(column.name)) as T
         is Long -> return getLong(getColumnIndex(column.name)) as T
+        is Boolean -> return (getInt(getColumnIndex(column.name)) == 1) as T
         else -> throw UnsupportedOperationException("${column.type} is not a supported type")
     }
 }
@@ -29,7 +30,7 @@ fun ContentValues.addAll(columns: Array<Column>, values: Array<Any?>): ContentVa
                 is String -> put(column.name, value as String)
                 is Int -> put(column.name, value as Int)
                 is Long -> put(column.name, value as Long)
-                is Boolean -> put(column.name, value as Boolean)
+                is Boolean -> put(column.name, if ((value as Boolean)) 1 else 0)
                 else -> throw IllegalArgumentException("${column.type} not supported by this method")
             }
         }

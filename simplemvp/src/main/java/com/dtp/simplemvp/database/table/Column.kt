@@ -10,6 +10,7 @@ class Column(val type: Any, val name: String, val notNull: Boolean = false, val 
         val INT = 1
         val STRING = ""
         val LONG = 1L
+        val BOOLEAN = false
 
         // Constrains
         val NOT_NULL = "NOT NULL"

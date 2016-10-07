@@ -7,7 +7,7 @@ import com.dtp.simplemvp.mvp.view.ViewLayer
 /**
  * Created by ryantaylor on 9/26/16.
  */
-abstract class BaseStatePresenter<T: State, out V: ViewLayer>(val view: V) : StatePresenter<T> {
+abstract class BaseStatePresenter<T: State, V: ViewLayer>() : StatePresenter<T, V> {
 
     override fun load(presenterData: PresenterData?) {
         if (presenterData != null) {
@@ -17,7 +17,7 @@ abstract class BaseStatePresenter<T: State, out V: ViewLayer>(val view: V) : Sta
         } else if (StateManager.hasState(stateKey)) {
             state = StateManager.getState(stateKey)
 
-            loadFromSavedState()
+            reload()
         } else {
             state = newState()
             StateManager.addState(stateKey, state)
@@ -29,7 +29,7 @@ abstract class BaseStatePresenter<T: State, out V: ViewLayer>(val view: V) : Sta
     /**
      * Called when loading from the state saved in StateManager.
      */
-    protected abstract fun loadFromState()
+    protected abstract fun reload()
 
     /**
      * Called when loading from savedInstanceState. The activity has been destroyed and recreated by the system
@@ -41,6 +41,8 @@ abstract class BaseStatePresenter<T: State, out V: ViewLayer>(val view: V) : Sta
     }
 
     override fun destroy() {
+        super.destroy()
+
         StateManager.removeState(stateKey)
     }
 }

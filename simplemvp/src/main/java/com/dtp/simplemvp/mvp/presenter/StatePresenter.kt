@@ -1,11 +1,12 @@
 package com.dtp.simplemvp.mvp.presenter
 
 import com.dtp.simplemvp.mvp.state.State
+import com.dtp.simplemvp.mvp.view.ViewLayer
 
 /**
  * Created by rtaylor on 9/29/16.
  */
-interface StatePresenter<T: State> : Presenter {
+interface StatePresenter<T: State, V: ViewLayer> : Presenter<V> {
     /**
      * This should be a lateinit object that the BasePresenter will setup before it calls any of the load methods
      */
@@ -14,7 +15,10 @@ interface StatePresenter<T: State> : Presenter {
 
     fun load(presenterData: PresenterData?)
     fun saveState(presenterData: PresenterData)
-    override fun destroy()
+
+    override fun destroy() {
+        super.destroy()
+    }
 
     fun newState(): T
 }

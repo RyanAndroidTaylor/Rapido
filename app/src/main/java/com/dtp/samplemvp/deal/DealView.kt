@@ -1,11 +1,11 @@
 package com.dtp.samplemvp.deal
 
-import com.dtp.simplemvp.mvp.view.ViewLayer
+import com.dtp.rapido.mvp.view.ViewLayer
 
 /**
  * Created by ryantaylor on 9/22/16.
  */
-interface DealView : ViewLayer{
+interface DealView : ViewLayer {
 
     fun displayError(message: String)
 

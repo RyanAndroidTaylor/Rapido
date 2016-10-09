@@ -2,7 +2,7 @@ package com.dtp.samplemvp
 
 import android.app.Application
 import com.dtp.samplemvp.common.database.DatabaseOpenHelper
-import com.dtp.simplemvp.database.DataConnection
+import com.dtp.rapido.database.DataConnection
 import com.idescout.sql.SqlScoutServer
 
 /**

@@ -2,7 +2,7 @@ package com.dtp.samplemvp.deal
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.dtp.simplemvp.mvp.state.State
+import com.dtp.rapido.mvp.state.State
 
 /**
  * Created by ryantaylor on 9/26/16.

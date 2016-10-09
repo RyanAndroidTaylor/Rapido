@@ -2,41 +2,41 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.simplemvp.database.table.Column.Companion.STRING
-import com.dtp.simplemvp.database.item_builder.ChildItemBuilder
-import com.dtp.simplemvp.database.item_builder.ParentItemBuilder
-import com.dtp.simplemvp.database.table.ChildDataTable
-import com.dtp.simplemvp.database.table.Column
-import com.dtp.simplemvp.database.table.ParentDataTable
-import com.dtp.simplemvp.addAll
-import com.dtp.simplemvp.get
+import com.dtp.rapido.database.table.Column.Companion.STRING
+import com.dtp.rapido.database.item_builder.ChildItemBuilder
+import com.dtp.rapido.database.item_builder.ParentItemBuilder
+import com.dtp.rapido.database.table.ChildDataTable
+import com.dtp.rapido.database.table.Column
+import com.dtp.rapido.database.table.ParentDataTable
+import com.dtp.rapido.addAll
+import com.dtp.rapido.get
 import java.util.*
 
 /**
  * Created by ryantaylor on 9/22/16.
  */
 class Deal(
-        val features: String,
         val id: String,
+        val features: String,
         val items: List<Item>,
         val photos: List<String>,
         val title: String,
-        val story: String,
-        val theme: Theme,
+        val story: Story,
+        val theme: Theme?,
         val url: String,
         val topic: Topic?
-): ParentDataTable {
+) : ParentDataTable {
 
     companion object {
         val TABLE_NAME = "Deal"
 
+        val DEAL_ID = Column(STRING, "DealId", notNull = true, unique = true)
         val FEATURES = Column(STRING, "Features")
-        val DEAL_ID = Column(STRING, "DealId")
         val TITLE = Column(STRING, "Title")
         val STORY = Column(STRING, "Story")
         val URL = Column(STRING, "Url")
 
-        val COLUMNS = arrayOf(FEATURES, DEAL_ID, TITLE, STORY, URL)
+        val COLUMNS = arrayOf(DEAL_ID, FEATURES, TITLE, URL)
 
         val BUILDER = Builder()
     }
@@ -46,41 +46,54 @@ class Deal(
     }
 
     override fun contentValues(): ContentValues {
-        return ContentValues().addAll(COLUMNS, arrayOf(features, id, title, story, url))
+        return ContentValues().addAll(COLUMNS, arrayOf(id, features, title, url))
     }
 
     override fun getChildren(): List<ChildDataTable> {
         val children = ArrayList<ChildDataTable>()
 
-        topic?.let { children.add(it) }
-        children.addAll(items)
+        topic?.let { children.add(it.apply { dealId = id }) }
+        children.add(story.apply { dealId = id })
+
+        for (item in items) {
+            item.dealId = id
+
+            children.add(item)
+        }
+
+        for (photo in photos)
+            children.add(Photo(id, photo))
 
         return children
     }
 
-    class Builder: ParentItemBuilder<Deal>() {
+    class Builder : ParentItemBuilder<Deal>() {
+        override val foreignKey: Column = DEAL_ID
 
         override fun buildItem(cursor: Cursor, children: List<ChildDataTable>?): Deal {
             val items = ArrayList<Item>()
+            val photos = ArrayList<String>()
             var topic: Topic? = null
             var theme: Theme? = null
+            var story: Story? = null
 
             children?.let {
                 for (child in it) {
-                    if (child is Theme)
-                        theme = child
-                    if (child is Topic)
-                        topic = child
-                    if (child is Item)
-                        items.add(child)
+                    when (child) {
+                        is Theme -> theme = child
+                        is Topic -> topic = child
+                        is Item -> items.add(child)
+                        is Photo -> photos.add(child.url)
+                        is Story -> story = child
+                    }
                 }
             }
 
-            return Deal(cursor.get(FEATURES), cursor.get(DEAL_ID), items, listOf("Need to figure out photo urls"), cursor.get(TITLE), cursor.get(STORY), theme!!, cursor.get(URL), topic)
+            return Deal(cursor.get(FEATURES), cursor.get(DEAL_ID), items, photos, cursor.get(TITLE), story!!, theme, cursor.get(URL), topic)
         }
 
-        override fun getChildBuilders(): List<Pair<String, ChildItemBuilder>> {
-            return listOf(Item.TABLE_NAME to Item.BUILDER, Topic.TABLE_NAME to Topic.BUILDER)
+        override fun getChildBuilders(): List<ChildItemBuilder<*>> {
+            return listOf(Item.BUILDER, Topic.BUILDER, Story.BUILDER, Photo.BUILDER, Theme.BUILDER)
         }
     }
 }

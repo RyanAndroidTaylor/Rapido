@@ -52,7 +52,8 @@ class Deal(
     override fun getChildren(): List<ChildDataTable> {
         val children = ArrayList<ChildDataTable>()
 
-        topic?.let { children.add(it.apply { dealId = id }) }
+        topic?.let { children.add(topic.apply { dealId = id }) }
+
         children.add(story.apply { dealId = id })
 
         for (item in items) {

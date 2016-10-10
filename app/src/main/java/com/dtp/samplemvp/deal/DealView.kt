@@ -9,5 +9,5 @@ interface DealView : ViewLayer {
 
     fun displayError(message: String)
 
-    fun displayNewText(text: String)
+    fun displayImages(imageUrls: List<String>)
 }

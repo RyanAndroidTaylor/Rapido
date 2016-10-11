@@ -39,6 +39,10 @@ data class Item(val id: String, var dealId: String, val condition: String, val p
         return ContentValues().addAll(COLUMNS, arrayOf(id, dealId, condition, price, photo))
     }
 
+    override fun setForeignKeyValue(parentId: String) {
+        dealId = parentId
+    }
+
     class Builder: ChildItemBuilder<Item> {
         override val tableName = TABLE_NAME
         override val foreignKey = DEAL_ID

@@ -12,7 +12,7 @@ import com.dtp.rapido.get
 /**
  * Created by ryantaylor on 10/8/16.
  */
-data class Photo(val dealId: String, val url: String): ChildDataTable {
+data class Photo(var dealId: String, val url: String): ChildDataTable {
 
     companion object {
         val TABLE_NAME = "Photo"
@@ -31,6 +31,10 @@ data class Photo(val dealId: String, val url: String): ChildDataTable {
 
     override fun contentValues(): ContentValues {
         return ContentValues().addAll(COLUMNS, arrayOf(dealId, url))
+    }
+
+    override fun setForeignKeyValue(foreignKey: String) {
+        dealId = foreignKey
     }
 
     class Builder: ChildItemBuilder<Photo> {

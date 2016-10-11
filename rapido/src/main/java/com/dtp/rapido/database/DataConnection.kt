@@ -36,8 +36,11 @@ object DataConnection {
         if (item is ParentDataTable) {
             val children = item.getChildren()
 
-            for (child in children)
+            for (child in children) {
+                child.setForeignKeyValue(item.getForeignKeyValue())
+
                 database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
+            }
         }
 
         database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
@@ -154,7 +157,7 @@ object DataConnection {
     }
 
     private fun <T> buildParentWithCursor(parentBuilder: ParentItemBuilder<T>, cursor: Cursor, database: SQLiteDatabase): T {
-        val parentForeignKey = cursor.get<String>(parentBuilder.foreignKey)
+        val parentForeignKey: String = cursor.get(parentBuilder.foreignKey)
 
         val children = ArrayList<ChildDataTable>()
 

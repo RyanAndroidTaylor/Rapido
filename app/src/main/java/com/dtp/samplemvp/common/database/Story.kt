@@ -34,6 +34,10 @@ data class Story(var dealId: String, val title: String, val body: String): Child
         return ContentValues().addAll(COLUMNS, arrayOf(dealId, title, body))
     }
 
+    override fun setForeignKeyValue(foreignKey: String) {
+        dealId = foreignKey
+    }
+
     class Builder : ChildItemBuilder<Story> {
         override val tableName = TABLE_NAME
         override val foreignKey = DEAL_ID

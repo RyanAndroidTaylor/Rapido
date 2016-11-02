@@ -40,6 +40,10 @@ data class Topic(val id: String, var dealId: String, val commentCount: Int, val 
         return ContentValues().addAll(COLUMNS, arrayOf(id, dealId, commentCount, createdAt, replyCount, url, voteCount))
     }
 
+    override fun setForeignKeyValue(foreignKey: String) {
+        dealId = foreignKey
+    }
+
     class Builder : ChildItemBuilder<Topic> {
         override val tableName = TABLE_NAME
         override val foreignKey = DEAL_ID

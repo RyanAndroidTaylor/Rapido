@@ -6,14 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.dtp.samplemvp.R
-import com.dtp.samplemvp.common.database.Photo
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.deal_image_view.view.*
 
 /**
  * Created by ryantaylor on 10/9/16.
  */
-class ListRecyclerView(var items: List<String>) : RecyclerView.Adapter<ListRecyclerView.ViewHolder>() {
+class DealImageAdapter(var items: List<String>) : RecyclerView.Adapter<DealImageAdapter.ViewHolder>() {
 
     override fun getItemCount(): Int {
         return items.size

@@ -30,7 +30,7 @@ class DealPresenter(override var view: DealView?) : BaseStatePresenter<DealState
     private fun getDeals() {
         dealService.getDeal(object : BaseCallback<Deal> {
             override fun succeeded(item: Deal) {
-
+                view?.displayImages(item.photos)
             }
 
             override fun failed(message: String?) {

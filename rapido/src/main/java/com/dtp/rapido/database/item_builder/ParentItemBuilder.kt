@@ -11,7 +11,7 @@ abstract class ParentItemBuilder<out T> : ItemBuilder<T> {
     abstract val foreignKey: Column
 
     override fun buildItem(cursor: Cursor): T {
-        throw UnsupportedOperationException("Parent must use buildItem(cursor: Cursor, children: List<ChildDataTable>? = null): T build method")
+        throw UnsupportedOperationException("Parent must use buildItem(cursor: Cursor, children: List<ChildDataTable>? = null): T method")
     }
 
     abstract fun buildItem(cursor: Cursor, children: List<ChildDataTable>? = null): T

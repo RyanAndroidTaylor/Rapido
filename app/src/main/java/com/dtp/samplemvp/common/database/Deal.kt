@@ -49,18 +49,19 @@ class Deal(
         return ContentValues().addAll(COLUMNS, arrayOf(id, features, title, url))
     }
 
+    override fun getForeignKeyValue(): String {
+        return id
+    }
+
     override fun getChildren(): List<ChildDataTable> {
         val children = ArrayList<ChildDataTable>()
 
-        topic?.let { children.add(topic.apply { dealId = id }) }
+        topic?.let { children.add(topic) }
 
-        children.add(story.apply { dealId = id })
+        children.add(story)
 
-        for (item in items) {
-            item.dealId = id
-
+        for (item in items)
             children.add(item)
-        }
 
         for (photo in photos)
             children.add(Photo(id, photo))

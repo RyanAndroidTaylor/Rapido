@@ -13,7 +13,7 @@ import com.dtp.rapido.get
 /**
  * Created by ryantaylor on 9/23/16.
  */
-data class Theme(val dealId: String, val accentColor: String, val backgroundColor: String, val backgroundImage: String, val foreground: String): ChildDataTable {
+data class Theme(var dealId: String, val accentColor: String, val backgroundColor: String, val backgroundImage: String, val foreground: String): ChildDataTable {
 
     companion object {
         val TABLE_NAME = "Theme"
@@ -35,6 +35,10 @@ data class Theme(val dealId: String, val accentColor: String, val backgroundColo
 
     override fun contentValues(): ContentValues {
         return ContentValues().addAll(COLUMNS, arrayOf(dealId, accentColor, backgroundColor, backgroundImage, foreground))
+    }
+
+    override fun setForeignKeyValue(foreignKey: String) {
+        dealId = foreignKey
     }
 
     class Builder: ChildItemBuilder<Theme> {

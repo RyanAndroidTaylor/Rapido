@@ -2,13 +2,9 @@ package com.dtp.samplemvp.deal
 
 import android.os.Bundle
 import android.support.design.widget.CollapsingToolbarLayout
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSnapHelper
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SnapHelper
-import android.view.View
 import android.widget.Toast
 import com.dtp.rapido.mvp.presenter.PresenterData
 
@@ -28,8 +24,9 @@ class DealActivity : BaseActivity<DealView, DealPresenter>(), DealView {
         collapsingToolbar = collapsing_deal_toolbar
         imageRecycler = deal_images
 
-        imageRecycler.onFlingListener = LinearSnapHelper()
         imageRecycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(imageRecycler)
 
         collapsingToolbar.title = "Today's Deal"
 
@@ -47,5 +44,6 @@ class DealActivity : BaseActivity<DealView, DealPresenter>(), DealView {
     }
 
     override fun displayImages(imageUrls: List<String>) {
+        imageRecycler.adapter = DealImageAdapter(imageUrls)
     }
 }

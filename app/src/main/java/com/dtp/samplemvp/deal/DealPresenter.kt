@@ -20,7 +20,7 @@ class DealPresenter(override var view: DealView?) : BaseStatePresenter<DealState
         return DealState()
     }
 
-    override fun load() {getDeals()
+    override fun start() {getDeals()
     }
 
     override fun reload() {

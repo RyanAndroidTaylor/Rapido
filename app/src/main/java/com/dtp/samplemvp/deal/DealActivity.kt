@@ -37,9 +37,9 @@ class DealActivity : BaseActivity<DealView, DealPresenter>(), DealView {
         presenter = DealPresenter(this)
 
         if (savedInstanceState != null)
-            presenter.load(PresenterData(savedInstanceState))
+            presenter.start(PresenterData(savedInstanceState))
         else
-            presenter.load(null)
+            presenter.start(null)
     }
 
     override fun displayError(message: String) {

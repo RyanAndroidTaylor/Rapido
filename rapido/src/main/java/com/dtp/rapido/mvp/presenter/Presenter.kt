@@ -1,5 +1,6 @@
 package com.dtp.rapido.mvp.presenter
 
+import android.view.View
 import com.dtp.rapido.mvp.view.ViewLayer
 
 /**
@@ -14,7 +15,9 @@ interface Presenter<V : ViewLayer> {
         view = null
     }
 
-    fun subscribe()
+    fun subscribe(view: V) {
+        this.view = view
+    }
 
     fun destroy() {
         view = null

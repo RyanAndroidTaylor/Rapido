@@ -15,7 +15,7 @@ open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        presenter.view = view
+        presenter.subscribe(view)
     }
 
     override fun onPause() {

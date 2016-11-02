@@ -27,14 +27,6 @@ class DealPresenter(override var view: DealView?) : BaseStatePresenter<DealState
 
     }
 
-    override fun unSubscribe() {
-
-    }
-
-    override fun subscribe() {
-
-    }
-
     private fun getDeals() {
         dealService.getDeal(object : BaseCallback<Deal> {
             override fun succeeded(item: Deal) {

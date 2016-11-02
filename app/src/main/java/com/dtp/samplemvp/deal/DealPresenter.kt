@@ -1,6 +1,5 @@
 package com.dtp.samplemvp.deal
 
-import com.dtp.rapido.database.DataConnection
 import com.dtp.samplemvp.common.BaseCallback
 import com.dtp.samplemvp.common.database.Deal
 import com.dtp.samplemvp.common.network.DealService
@@ -20,10 +19,19 @@ class DealPresenter(override var view: DealView?) : BaseStatePresenter<DealState
         return DealState()
     }
 
-    override fun start() {getDeals()
+    override fun load() {
+        getDeals()
     }
 
-    override fun reload() {
+    override fun loadFromState() {
+
+    }
+
+    override fun unSubscribe() {
+
+    }
+
+    override fun subscribe() {
 
     }
 

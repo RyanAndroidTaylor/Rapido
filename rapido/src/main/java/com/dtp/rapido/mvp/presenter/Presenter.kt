@@ -8,11 +8,13 @@ import com.dtp.rapido.mvp.view.ViewLayer
 interface Presenter<V : ViewLayer> {
     var view: V?
 
-    fun start()
+    fun load()
 
-    fun unload()
+    fun unSubscribe() {
+        view = null
+    }
 
-    fun reload()
+    fun subscribe()
 
     fun destroy() {
         view = null

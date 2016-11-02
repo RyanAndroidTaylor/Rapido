@@ -9,28 +9,28 @@ import com.dtp.rapido.mvp.view.ViewLayer
  */
 abstract class BaseStatePresenter<T: State, V: ViewLayer>() : StatePresenter<T, V> {
 
-    override fun start(presenterData: PresenterData?) {
+    override fun load(presenterData: PresenterData?) {
         if (presenterData != null) {
             state = presenterData.loadState(stateKey)
 
-            startFromState()
+            loadFromState()
         } else if (StateManager.hasState(stateKey)) {
             state = StateManager.getState(stateKey)
 
-            startFromState()
+            loadFromState()
         } else {
             state = newState()
 
             StateManager.addState(stateKey, state)
 
-            start()
+            load()
         }
     }
 
     /**
      * Called when a loaded from some saved state. Either savedInstanceState or from StateManager
      */
-    protected abstract fun startFromState()
+    protected abstract fun loadFromState()
 
     override fun saveState(presenterData: PresenterData) {
         presenterData.saveState(stateKey, state)

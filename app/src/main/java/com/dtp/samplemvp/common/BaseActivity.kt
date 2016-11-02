@@ -21,7 +21,7 @@ open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        presenter.view = null
+        presenter.unSubscribe()
 
         if (isFinishing)
             presenter.destroy()

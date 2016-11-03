@@ -1,6 +1,5 @@
 package com.dtp.rapido.mvp.presenter
 
-import android.view.View
 import com.dtp.rapido.mvp.view.ViewLayer
 
 /**

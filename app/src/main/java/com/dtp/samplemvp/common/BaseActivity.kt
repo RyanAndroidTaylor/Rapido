@@ -1,5 +1,7 @@
 package com.dtp.samplemvp.common
 
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import com.dtp.rapido.mvp.presenter.Presenter
 import com.dtp.rapido.mvp.view.ViewLayer
@@ -11,6 +13,10 @@ open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
 
     lateinit var presenter: P
     lateinit var view: V
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onResume() {
         super.onResume()
@@ -25,5 +31,10 @@ open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
 
         if (isFinishing)
             presenter.destroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+
+        super.onSaveInstanceState(outState, outPersistentState)
     }
 }

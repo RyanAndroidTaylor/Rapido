@@ -3,9 +3,7 @@ package com.dtp.rapido.database
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.dtp.rapido.database.item_builder.ChildItemBuilder
 import com.dtp.rapido.database.item_builder.ItemBuilder
-import com.dtp.rapido.database.item_builder.ParentItemBuilder
 import com.dtp.rapido.database.query.Query
 import com.dtp.rapido.database.table.ChildDataTable
 import com.dtp.rapido.database.table.Column
@@ -38,7 +36,7 @@ object DataConnection {
             val children = item.getChildren()
 
             for (child in children) {
-                child.setForeignKeyValue(item.getForeignKeyValue())
+                child.setParentForeignKey(item.parentForeignKey())
 
                 database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
             }
@@ -116,13 +114,8 @@ object DataConnection {
 
         val cursor = getCursor(database, query)
 
-        if (cursor.moveToFirst()) {
-            if (builder is ParentItemBuilder) {
-                item = buildParentWithCursor(builder, cursor, database)
-            } else {
-                item = builder.buildItem(cursor)
-            }
-        }
+        if (cursor.moveToFirst())
+            item = builder.buildItem(cursor)
 
         cursor.close()
 
@@ -138,13 +131,8 @@ object DataConnection {
 
         val cursor = getCursor(database, query)
 
-        if (builder is ParentItemBuilder) {
-            while (cursor.moveToNext())
-                buildParentWithCursor(builder, cursor, database)
-        } else {
-            while (cursor.moveToNext())
-                items.add(builder.buildItem(cursor))
-        }
+        while (cursor.moveToNext())
+            items.add(builder.buildItem(cursor))
 
         cursor.close()
 
@@ -155,33 +143,5 @@ object DataConnection {
 
     fun getCursor(database: SQLiteDatabase, query: Query): Cursor {
         return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
-    }
-
-    private fun <T> buildParentWithCursor(parentBuilder: ParentItemBuilder<T>, cursor: Cursor, database: SQLiteDatabase): T {
-        val parentForeignKey: String = cursor.get(parentBuilder.foreignKey)
-
-        val children = ArrayList<ChildDataTable>()
-
-        val childrenBuilders = parentBuilder.getChildBuilders()
-
-        for (childBuilder in childrenBuilders) {
-            children.addAll(findAllChildren(database, childBuilder, parentForeignKey))
-        }
-
-        return parentBuilder.buildItem(cursor, children)
-    }
-
-    private fun findAllChildren(database: SQLiteDatabase, childBuilder: ChildItemBuilder<*>, parentForeignKey: String): List<ChildDataTable> {
-        val items = ArrayList<ChildDataTable>()
-
-        val cursor = database.query(childBuilder.tableName, null, "${childBuilder.foreignKey.name} =? ", arrayOf(parentForeignKey), null, null, null, null)
-
-        while (cursor.moveToNext()) {
-            items.add(childBuilder.buildItem(cursor))
-        }
-
-        cursor.close()
-
-        return items
     }
 }

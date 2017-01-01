@@ -5,5 +5,5 @@ package com.dtp.rapido.database.table
  */
 interface ParentDataTable : DataTable {
     fun getChildren(): List<ChildDataTable>
-    fun getForeignKeyValue(): String
+    fun parentForeignKey(): String
 }

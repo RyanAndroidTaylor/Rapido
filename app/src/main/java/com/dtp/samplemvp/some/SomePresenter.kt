@@ -14,10 +14,6 @@ class SomePresenter(): BaseStatePresenter<SomeState, SomeView>() {
 
     private var something = "Nothing"
 
-    override fun load() {
-
-    }
-
     override fun loadFromState(state: SomeState) {
         something = state.something
     }

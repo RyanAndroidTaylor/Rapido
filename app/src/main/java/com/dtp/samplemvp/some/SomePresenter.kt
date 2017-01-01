@@ -1,7 +1,7 @@
 package com.dtp.samplemvp.some
 
-import com.dtp.rapido.mvp.presenter.BaseStatePresenter
-import com.dtp.rapido.mvp.presenter.PresenterData
+import com.dtp.rapidomvp.presenter.BaseStatePresenter
+import com.dtp.rapidomvp.presenter.PresenterData
 
 /**
  * Created by ner on 11/2/16.

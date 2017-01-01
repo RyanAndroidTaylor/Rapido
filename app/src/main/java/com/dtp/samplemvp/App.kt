@@ -2,7 +2,7 @@ package com.dtp.samplemvp
 
 import android.app.Application
 import com.dtp.samplemvp.common.database.DatabaseOpenHelper
-import com.dtp.rapido.database.DataConnection
+import com.izeni.rapidosqlite.DataConnection
 import com.idescout.sql.SqlScoutServer
 
 /**
@@ -19,7 +19,7 @@ class App : Application() {
 
         instance = this
 
-        DataConnection.init(DatabaseOpenHelper(this))
+        com.izeni.rapidosqlite.DataConnection.init(DatabaseOpenHelper(this))
 
         SqlScoutServer.create(this, packageName)
     }

@@ -4,7 +4,7 @@ import java.util.*
 import android.os.Parcel
 import android.os.Parcelable
 
-import com.dtp.rapido.mvp.state.State
+import com.dtp.rapidomvp.state.State
 
 /**
  * Created by ner on 11/2/16.

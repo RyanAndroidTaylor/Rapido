@@ -3,8 +3,8 @@ package com.dtp.samplemvp.common
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
-import com.dtp.rapido.mvp.presenter.Presenter
-import com.dtp.rapido.mvp.view.ViewLayer
+import com.dtp.rapidomvp.presenter.Presenter
+import com.dtp.rapidomvp.view.ViewLayer
 
 /**
  * Created by ryantaylor on 10/8/16.

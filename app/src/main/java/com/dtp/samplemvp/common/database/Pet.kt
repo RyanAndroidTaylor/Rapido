@@ -2,13 +2,13 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
-import com.dtp.rapido.addAll
-import com.dtp.rapido.database.item_builder.ItemBuilder
-import com.dtp.rapido.database.table.ChildDataTable
-import com.dtp.rapido.database.table.Column
-import com.dtp.rapido.database.table.Column.Companion.INT
-import com.dtp.rapido.database.table.Column.Companion.STRING
-import com.dtp.rapido.get
+import com.izeni.rapidosqlite.addAll
+import com.izeni.rapidosqlite.item_builder.ItemBuilder
+import com.izeni.rapidosqlite.table.ChildDataTable
+import com.izeni.rapidosqlite.table.Column
+import com.izeni.rapidosqlite.table.Column.Companion.INT
+import com.izeni.rapidosqlite.table.Column.Companion.STRING
+import com.izeni.rapidosqlite.get
 
 /**
  * Created by ner on 12/31/16.

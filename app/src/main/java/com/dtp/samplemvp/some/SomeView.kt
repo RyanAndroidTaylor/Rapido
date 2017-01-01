@@ -1,6 +1,6 @@
 package com.dtp.samplemvp.some
 
-import com.dtp.rapido.mvp.view.ViewLayer
+import com.dtp.rapidomvp.view.ViewLayer
 
 /**
  * Created by ner on 11/2/16.

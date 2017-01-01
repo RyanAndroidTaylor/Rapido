@@ -1,17 +1,18 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
     defaultConfig {
-        applicationId "com.dtp.samplemvp"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -26,21 +27,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
 
-    compile project(path: ':rapidomvp')
-    compile project(path: ':rapidosqlite')
+    compile 'com.android.support:appcompat-v7:25.1.0'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
-
-    compile 'com.idescout.sql:sqlscout-server:1.0'
-
-    compile 'com.squareup.picasso:picasso:2.5.2'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

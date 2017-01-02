@@ -46,7 +46,7 @@ data class Person(val uuid: String, val name: String, val pets: List<Pet>) : Par
 
             val pets = com.izeni.rapidosqlite.DataConnection.findAll(Pet.BUILDER,
                                                                      QueryBuilder()
-                                                      .from(Pet.TABLE_NAME)
+                                                      .with(Pet.TABLE_NAME)
                                                       .where(Pet.OWNER)
                                                       .equals(personUuid)
                                                       .build())

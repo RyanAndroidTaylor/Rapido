@@ -5,7 +5,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.Query
-import com.izeni.rapidosqlite.table.ChildDataTable
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
@@ -27,10 +26,23 @@ object DataConnection {
         this.sqliteOpenHelper = databaseHelper
     }
 
-    //TODO Need to begin and end transactions
     fun save(item: DataTable) {
         val database = database
 
+        save(item, database)
+
+        database.close()
+    }
+
+    fun saveAll(items: List<DataTable>) {
+        val database = this.database
+
+        items.forEach { save(it, database) }
+
+        database.close()
+    }
+
+    private fun save(item: DataTable, database: SQLiteDatabase) {
         if (item is ParentDataTable) {
             val children = item.getChildren()
 
@@ -42,25 +54,6 @@ object DataConnection {
         }
 
         database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
-
-        database.close()
-    }
-
-    fun saveAll(items: List<DataTable>) {
-        val database = this.database
-
-        for (item in items) {
-            database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
-
-            if (item is ParentDataTable) {
-                val children = item.getChildren()
-
-                for (child in children)
-                    database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
-            }
-        }
-
-        database.close()
     }
 
     /**

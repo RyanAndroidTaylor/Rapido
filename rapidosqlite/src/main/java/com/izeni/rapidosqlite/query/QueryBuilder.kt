@@ -35,7 +35,7 @@ class QueryBuilder {
         return this
     }
 
-    fun from(tableName: String): QueryBuilder {
+    fun with(tableName: String): QueryBuilder {
         this.tableName = tableName
 
         return this

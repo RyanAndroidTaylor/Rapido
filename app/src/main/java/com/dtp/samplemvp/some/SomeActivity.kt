@@ -33,7 +33,7 @@ class SomeActivity: BaseActivity<SomeView, SomePresenter>(), SomeView {
 
         com.izeni.rapidosqlite.DataConnection.save(person)
 
-        val savedPerson = com.izeni.rapidosqlite.DataConnection.findFirst(Person.BUILDER, QueryBuilder().from(Person.TABLE_NAME).build())
+        val savedPerson = com.izeni.rapidosqlite.DataConnection.findFirst(Person.BUILDER, QueryBuilder().with(Person.TABLE_NAME).build())
 
         Log.i("SomeActivity", "SavedPerson $savedPerson")
     }

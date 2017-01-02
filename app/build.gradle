@@ -31,6 +31,7 @@ dependencies {
 
     compile project(path: ':rapidomvp')
     compile project(path: ':rapidosqlite')
+    compile project(path: ':rapidocommon')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

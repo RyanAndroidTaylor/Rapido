@@ -1,4 +1,4 @@
-package com.izeni.rapidocommon
+package com.izeni.rapidocommon.recycler
 
 import android.support.v7.widget.RecyclerView
 import android.view.View

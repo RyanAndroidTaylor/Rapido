@@ -33,6 +33,22 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     compile "com.android.support:recyclerview-v7:$support_version"
+    compile "com.android.support:design:$support_version"
+
+    compile "com.android.support.constraint:constraint-layout:$constraint_version"
+
+    compile "io.reactivex.rxjava2:rxjava:$rx2_version"
+    compile "io.reactivex.rxjava2:rxandroid:$rx2_version"
+
+    compile "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    compile "com.squareup.okhttp3:okhttp:$okhttp_version"
+    compile("com.yalantis:ucrop:2.2.0") { exclude module: 'okhttp' }
+
+    compile("com.squareup.retrofit2:retrofit:$retrofit_version") { exclude module: 'okhttp' }
+    compile "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:$rx2_retrofit"
+    compile "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    compile "com.squareup.picasso:picasso:$picasso_version"
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

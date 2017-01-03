@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleImageView">
+        <attr name="panko_letterText" format="string" />
+        <attr name="panko_textColor" format="reference" />
+        <attr name="panko_textSize" format="dimension" />
+        <attr name="panko_border_width" format="dimension" />
+        <attr name="panko_border_color" format="color" />
+        <attr name="panko_border_overlay" format="boolean" />
+        <attr name="panko_fill_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="BoundAspectImageView">
+        <attr name="panko_widthConstraint" format="dimension" />
+        <attr name="panko_heightConstraint" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="AspectImageView">
+        <attr name="panko_ratio" format="float" />
+        <attr name="panko_matchHeight" format="boolean" />
+    </declare-styleable>
+</resources>

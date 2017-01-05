@@ -59,15 +59,6 @@ object NetworkProvider {
     private var network_context: Context by Delegates.notNull()
     private var contextInitialized: Boolean = false
 
-//    val realmExclusionGson by lazy {
-//        GsonBuilder()
-//                .setExclusionStrategies(object : ExclusionStrategy {
-//                    override fun shouldSkipClass(clazz: Class<*>?) = clazz?.declaringClass?.equals(RealmObject::class.java) ?: false
-//                    override fun shouldSkipField(f: FieldAttributes?) = false
-//                })
-//
-//    }
-
     private val picassoManager by lazy { ResettableLazyManager() }
     val picasso: Picasso by ResettableLazy(picassoManager) {
         if(!contextInitialized) throw IllegalStateException("Network context has not been initialized.  Make sure you call setNetworkContext or Panko.init before using this method.")

@@ -1,6 +1,7 @@
 package com.izeni.rapidocommon.network.errors
 
 import com.izeni.rapidocommon.e
+import retrofit2.Response
 import java.util.*
 
 /**
@@ -31,6 +32,30 @@ object NetworkErrorParser {
             e("Unable to find matching error for errorMessage: $errorMessage")
 
             return UnknownError()
+        }
+
+        return error
+    }
+
+    fun <T> parseRetrofitError(response: Response<T>): Error {
+        var error: Error? = null
+
+        if (errors.containsKey(response.errorBody()?.string()))
+            error = errors[response.errorBody()?.string()]
+        else if (errors.containsKey(response.message()))
+            error = errors[response.message()]
+        else if (errors.containsKey(response.code().toString()))
+            error = errors[response.code().toString()]
+        else if (!response.errorBody().string().isNullOrEmpty())
+            error = MessageError(response.errorBody().string())
+        else if (!response.message().isNullOrEmpty())
+            error = MessageError(response.message())
+
+
+        if (error == null) {
+            e("Unable to find matching error for errorMessage: $response")
+
+            error = UnknownError()
         }
 
         return error

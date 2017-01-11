@@ -1,7 +1,7 @@
 package com.izeni.rapidocommon.recycler
 
 import android.support.annotation.LayoutRes
-import android.util.SparseArray
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.izeni.rapidocommon.view.inflate
@@ -9,36 +9,68 @@ import com.izeni.rapidocommon.view.inflate
 /**
  * Created by ner on 1/2/17.
  */
-abstract class MultiViewHolderAdapter(items: MutableList<AdapterItem<Any>>, vararg viewHolders: ViewHolderData) : ItemAdapter<MultiViewHolderAdapter.AdapterItem<Any>>(items) {
+abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHeader: ViewHolderData<HeaderData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
 
-    private val holders = SparseArray<ViewHolderData>()
-
-    init {
-        viewHolders.forEach { holders.put(it.layoutId, it) }
+    companion object {
+        val HEADER = 0
     }
+
+    private val sectionManager by lazy { SectionManager(this, sections) }
 
     override fun getItemViewType(position: Int): Int {
-        return items[position].viewHolderId
+        return sectionManager.getViewHolderType(position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<AdapterItem<Any>> {
-        return holders[viewType]!!.createViewHolder(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<*> {
+        if (viewType == HEADER)
+            return sectionHeader!!.createViewHolder(parent)
+        else
+            return sectionManager.createViewHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder<AdapterItem<Any>>, position: Int) {
-        holder.bind(items[position])
+    override fun onBindViewHolder(holder: ViewHolder<*>, position: Int) {
+        val type = getItemViewType(position)
+
+        if (type == HEADER)
+            sectionManager.bindHeader(holder, position)
+        else
+            sectionManager.bind(holder, position)
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = sectionManager.count
 
-    abstract class AdapterItem<out T>(val data: T) {
-        abstract val viewHolderId: Int
+    fun addItem(sectionType: Int, item: Any) {
+        sectionManager.addItem(sectionType, item)
     }
 
-    class ViewHolderData(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<AdapterItem<Any>>) {
-
-        fun createViewHolder(parent: ViewGroup): ViewHolder<AdapterItem<Any>> {
+    class ViewHolderData<in T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
+        fun createViewHolder(parent: ViewGroup): ViewHolder<T> {
             return viewHolder(parent.inflate(layoutId))
+        }
+    }
+
+    class HeaderData(val type: Int, val sectionCount: Int)
+
+    abstract class Section<T>(val type: Int, val items: MutableList<T>, val viewHolderData: ViewHolderData<T>, val hasHeader: Boolean = false) {
+
+        val count: Int
+            get() = items.size
+
+        val headerCount = if (hasHeader) 1 else 0
+
+        @Suppress("UNCHECKED_CAST")
+        fun bind(viewHolder: ViewHolder<*>, position: Int) {
+            (viewHolder as ViewHolder<T>).bind(items[position])
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        fun bindHeader(viewHolder: ViewHolder<*>) {
+            (viewHolder as ViewHolder<HeaderData>).bind(HeaderData(type, items.size))
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        fun addItem(item: Any) {
+            items.add(item as T)
         }
     }
 }

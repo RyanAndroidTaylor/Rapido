@@ -1,39 +1,20 @@
 package com.izeni.rapidocommon.recycler
 
-import android.support.v7.widget.RecyclerView
+import android.support.annotation.IdRes
 import android.view.View
 import android.view.ViewGroup
+import com.izeni.rapidocommon.view.inflate
 
 /**
  * Created by ner on 1/2/17.
  */
-abstract class ItemAdapter<T>(val items: MutableList<T>) : RecyclerView.Adapter<ItemAdapter.ViewHolder<T>>() {
+abstract class ItemAdapter<T>(items: MutableList<T>,
+                              @IdRes val layoutId: Int,
+                              val viewHolder: (View) -> ViewHolder<T>) :
+        BaseAdapter<T>(items) {
 
-    abstract override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T>
 
-    override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
-        holder.bind(items[position])
-    }
-
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    abstract class ViewHolder<in T>(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(item: T)
-    }
-
-    fun addItem(item: T) {
-        items.add(item)
-
-        notifyItemChanged(items.size - 1)
-    }
-
-    fun addItems(newItems: List<T>) {
-        val startPosition = items.size + 1
-
-        items.addAll(newItems)
-
-        notifyItemRangeChanged(startPosition, newItems.size)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
+        return viewHolder(parent.inflate(layoutId))
     }
 }

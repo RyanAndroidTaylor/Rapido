@@ -50,8 +50,8 @@ dependencies {
 
     compile "com.squareup.picasso:picasso:$picasso_version"
 
-    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
-    compile 'com.afollestad.material-dialogs:commons:0.9.0.2'
+    compile "com.afollestad.material-dialogs:core:$material_dialogs_version"
+    compile "com.afollestad.material-dialogs:commons:$material_dialogs_version"
 
     compile "io.reactivex.rxjava2:rxandroid:$rx2_version"
     compile "io.reactivex.rxjava2:rxjava:$rx2_version"

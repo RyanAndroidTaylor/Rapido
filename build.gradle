@@ -9,6 +9,7 @@ buildscript {
     ext.retrofit_version = '2.1.0'
     ext.rx2_retrofit = '1.0.0'
     ext.picasso_version = '2.5.2'
+    ext.material_dialogs_version = '0.9.0.2'
 
     repositories {
         jcenter()

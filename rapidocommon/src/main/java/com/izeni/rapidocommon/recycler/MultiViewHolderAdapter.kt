@@ -9,13 +9,18 @@ import com.izeni.rapidocommon.view.inflate
 /**
  * Created by ner on 1/2/17.
  */
-abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHeader: ViewHolderData<HeaderData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
+abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHeader: ViewHolderData<SectionData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
 
     companion object {
-        val HEADER = 0
+        val HEADER = -112
     }
 
     private val sectionManager by lazy { SectionManager(this, sections) }
+
+    init {
+        if (sectionHeader == null && sectionManager.hasHeaders())
+            throw IllegalStateException("One of your sections has a header but there was no ViewHolderData passed for section headers")
+    }
 
     override fun getItemViewType(position: Int): Int {
         return sectionManager.getViewHolderType(position)
@@ -49,8 +54,9 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHea
         }
     }
 
-    class HeaderData(val type: Int, val sectionCount: Int)
+    class SectionData(val type: Int, val sectionCount: Int)
 
+    @Suppress("UNCHECKED_CAST")
     abstract class Section<T>(val type: Int, val items: MutableList<T>, val viewHolderData: ViewHolderData<T>, val hasHeader: Boolean = false) {
 
         val count: Int
@@ -58,19 +64,32 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHea
 
         val headerCount = if (hasHeader) 1 else 0
 
-        @Suppress("UNCHECKED_CAST")
         fun bind(viewHolder: ViewHolder<*>, position: Int) {
             (viewHolder as ViewHolder<T>).bind(items[position])
         }
 
-        @Suppress("UNCHECKED_CAST")
         fun bindHeader(viewHolder: ViewHolder<*>) {
-            (viewHolder as ViewHolder<HeaderData>).bind(HeaderData(type, items.size))
+            (viewHolder as ViewHolder<SectionData>).bind(SectionData(type, items.size))
         }
 
-        @Suppress("UNCHECKED_CAST")
         fun addItem(item: Any) {
             items.add(item as T)
+        }
+
+        fun addItemAt(index: Int, item: Any) {
+            items.add(index, item as T)
+        }
+
+        fun addItems(items: List<Any>) {
+            this.items.addAll(items as List<T>)
+        }
+
+        fun removeItem(item: Any): Int {
+            val index = items.indexOf(item as T)
+
+            items.removeAt(index)
+
+            return index
         }
     }
 }

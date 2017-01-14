@@ -9,7 +9,7 @@ import com.izeni.rapidocommon.view.inflate
 /**
  * Created by ner on 1/2/17.
  */
-abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHeader: ViewHolderData<SectionData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
+abstract class MultiViewHolderAdapter(sections: List<Section<*>>, private val sectionHeader: ViewHolderData<SectionData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
 
     companion object {
         val HEADER = -112
@@ -48,16 +48,38 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, val sectionHea
         sectionManager.addItem(sectionType, item)
     }
 
-    class ViewHolderData<in T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
+    fun addItemAt(index: Int, sectionType: Int, item: Any) {
+        sectionManager.addItemAt(index, sectionType, item)
+    }
+
+    fun addItems(sectionType: Int, items: List<Any>) {
+        sectionManager.addItems(sectionType, items)
+    }
+
+    fun removeItem(sectionType: Int, item: Any) {
+        sectionManager.removeItem(sectionType, item)
+    }
+
+    class ViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
+        var onClick: ((Int, T) -> Unit)? = null
+
         fun createViewHolder(parent: ViewGroup): ViewHolder<T> {
-            return viewHolder(parent.inflate(layoutId))
+            return viewHolder(parent.inflate(layoutId)).apply { this.onClick = this@ViewHolderData.onClick }
         }
     }
 
     class SectionData(val type: Int, val sectionCount: Int)
 
     @Suppress("UNCHECKED_CAST")
-    abstract class Section<T>(val type: Int, val items: MutableList<T>, val viewHolderData: ViewHolderData<T>, val hasHeader: Boolean = false) {
+    abstract class Section<T>(val type: Int,
+                              private val items: MutableList<T>,
+                              val viewHolderData: ViewHolderData<T>,
+                              onClick: ((Int, T) -> Unit)? = null,
+                              val hasHeader: Boolean = false) {
+
+        init {
+            viewHolderData.onClick = onClick
+        }
 
         val count: Int
             get() = items.size

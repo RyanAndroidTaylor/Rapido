@@ -3,16 +3,14 @@ package com.izeni.rapidocommon.recycler
 import android.util.SparseArray
 import android.util.SparseIntArray
 import android.view.ViewGroup
-import com.izeni.rapidocommon.d
 import com.izeni.rapidocommon.e
-import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter.Companion.HEADER
 
 /**
  * Created by ner on 1/11/17.
  */
 class SectionManager(private val adapter: MultiViewHolderAdapter, private val sections: List<MultiViewHolderAdapter.Section<*>>) {
 
-    private val sectionEnds = SparseArray<SectionSpan>()
+    private val sectionSpans = SparseArray<SectionSpan>()
     private val headers = SparseIntArray()
 
     val count: Int
@@ -33,12 +31,36 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
     private fun adjustPosition(position: Int): Int {
         var offset = (0..headers.size() - 1).count { headers.valueAt(it) < position }
 
-        (0..sectionEnds.size() - 1)
-                .map { sectionEnds.valueAt(it) }
+        (0..sectionSpans.size() - 1)
+                .map { sectionSpans.valueAt(it) }
                 .filter { it.isBefore(position) }
                 .forEach { offset += it.count }
 
         return position - offset
+    }
+
+    private fun bindSectionHeader(type: Int) {
+        headers.get(type, -1).let {
+            if (it != -1)
+                adapter.notifyItemChanged(it)
+        }
+    }
+
+    private fun getSectionForType(sectionType: Int): MultiViewHolderAdapter.Section<*> {
+        return sections.first { it.type == sectionType }
+    }
+
+    private fun updatePositions() {
+        var offset = 0
+
+        sections.forEach { section ->
+            if (section.hasHeader)
+                headers.put(section.type, 0 + offset)
+
+            sectionSpans.put(section.type, SectionSpan(section.headerCount + offset, (section.count - 1) + section.headerCount + offset))
+
+            offset += section.count + section.headerCount
+        }
     }
 
     fun getViewHolderType(position: Int): Int {
@@ -58,10 +80,10 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
     }
 
     fun getSectionType(position: Int): Int {
-        for (i in 0..sectionEnds.size() - 1) {
-            sectionEnds.valueAt(i).let {
+        for (i in 0..sectionSpans.size() - 1) {
+            sectionSpans.valueAt(i).let {
                 if (it.contains(position))
-                    return sectionEnds.keyAt(i)
+                    return sectionSpans.keyAt(i)
             }
         }
 
@@ -78,10 +100,6 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         return -1
     }
 
-    fun getSectionForType(sectionType: Int): MultiViewHolderAdapter.Section<*> {
-        return sections.first { it.type == sectionType }
-    }
-
     fun hasHeaders(): Boolean {
         sections.forEach {
             if (it.hasHeader)
@@ -95,76 +113,68 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         getSectionForType(getSectionType(position)).bind(viewHolder, adjustPosition(position))
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun bindHeader(viewHolder: ViewHolder<*>, position: Int) {
         getSectionForType(getHeaderSectionType(position)).bindHeader(viewHolder)
     }
 
     fun addItem(sectionType: Int, item: Any) {
         getSectionForType(sectionType).let {
-            val listEnd = sectionEnds.get(sectionType).end
-
             it.addItem(item)
 
             updatePositions()
 
-            adapter.notifyItemInserted(listEnd + 1)
+            adapter.notifyItemInserted(sectionSpans.get(sectionType).end)
+
+            bindSectionHeader(sectionType)
         }
     }
 
     fun addItemAt(index: Int, sectionType: Int, item: Any) {
         getSectionForType(sectionType).let {
-            val listStart = sectionEnds.get(sectionType).start
+            val listStart = sectionSpans.get(sectionType).start
 
             it.addItemAt(index, item)
 
             updatePositions()
 
             adapter.notifyItemInserted(listStart + index)
+
+            bindSectionHeader(sectionType)
         }
     }
 
     fun addItems(sectionType: Int, items: List<Any>) {
         getSectionForType(sectionType).let {
-            val listEnd = sectionEnds.get(sectionType).end
+            val listEnd = sectionSpans.get(sectionType).end
 
             it.addItems(items)
 
             updatePositions()
 
             adapter.notifyItemRangeChanged(listEnd + 1, listEnd + 1 + items.size)
+
+            bindSectionHeader(sectionType)
         }
     }
 
     fun removeItem(sectionType: Int, item: Any) {
         getSectionForType(sectionType).let {
-            val listStart = sectionEnds.get(sectionType).start
+            val listStart = sectionSpans.get(sectionType).start
 
             val index = it.removeItem(item)
 
             updatePositions()
 
             adapter.notifyItemRemoved(listStart + index)
-        }
-    }
 
-    private fun updatePositions() {
-        var offset = 0
-
-        sections.forEach { section ->
-            if (section.hasHeader)
-                headers.put(section.type, 0 + offset)
-
-            sectionEnds.put(section.type, SectionSpan(section.headerCount + offset, (section.count - 1) + section.headerCount + offset))
-
-            offset += section.count + section.headerCount
+            bindSectionHeader(sectionType)
         }
     }
 
     private class SectionSpan(val start: Int, val end: Int) {
 
         val count: Int
-            get() =  end - start + 1
+            get() = end - start + 1
 
         fun contains(position: Int): Boolean = position >= start && position <= end
 

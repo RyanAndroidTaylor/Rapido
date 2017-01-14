@@ -55,9 +55,7 @@ fun String.unescape(): String = this.replace("""\/""", "/")
 
 fun String?.nullSafe(default: String = ""): String = if (this == null) default else this
 
-inline infix fun Any?.isNull(if_true: () -> Unit) {
-    if (this == null) if_true.invoke()
-}
+inline fun <T> T?.whenNull(block: () -> Unit) { block() }
 
 inline infix fun Any?.isNotNull(if_true: (Any) -> Unit) {
     if (this != null) if_true.invoke(this)

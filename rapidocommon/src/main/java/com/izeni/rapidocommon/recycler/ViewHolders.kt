@@ -6,6 +6,8 @@ import android.view.View
 /**
  * Created by ner on 1/11/17.
  */
-abstract class ViewHolder<in T>(view: View) : RecyclerView.ViewHolder(view) {
+abstract class ViewHolder<T>(view: View) : RecyclerView.ViewHolder(view) {
+    var onClick: ((Int, T) -> Unit)? = null
+
     abstract fun bind(item: T)
 }

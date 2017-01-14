@@ -1,17 +1,19 @@
 package com.dtp.samplemvp.reycler
 
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.dtp.samplemvp.R
 import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter
-import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter.SectionData
 import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter.Section
-import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter.ViewHolderData
-import com.izeni.rapidocommon.recycler.ViewHolder
+import com.izeni.rapidocommon.recycler.MultiViewHolderAdapter.SectionedViewHolderData
+import com.izeni.rapidocommon.recycler.SectionManager.SectionData
+import com.izeni.rapidocommon.recycler.SectionedViewHolder
 import com.izeni.rapidocommon.view.bind
 import com.izeni.rapidocommon.view.onClick
 import kotlinx.android.synthetic.main.activity_multi_view_holder_sample.*
@@ -44,24 +46,34 @@ class MultiViewHolderSampleActivity : AppCompatActivity() {
         val sectionOne = object : Section<String>(
                 0,
                 mutableListOf("One", "Two", "Three", "Four", "Five", "Six"),
-                ViewHolderData(R.layout.item_sample_one, { SampleViewHolderOne(it) }),
+                SectionedViewHolderData(R.layout.item_sample_one, { SampleViewHolderOne(it) }),
                 { type, item -> adapter?.removeItem(type, item) },
-                true) {}
+                hasHeader = true,
+                isCollapsible = true) {}
 
         val sectionTwo = object : Section<Int>(
                 1,
                 mutableListOf(1, 2, 3, 4, 5, 6),
-                ViewHolderData(R.layout.item_sample_two, { SampleViewHolderTwo(it) }),
-                { type, item -> adapter?.removeItem(type, item) }, true) {}
+                SectionedViewHolderData(R.layout.item_sample_two, { SampleViewHolderTwo(it) }),
+                { type, item -> adapter?.removeItem(type, item) },
+                hasHeader = true,
+                isCollapsible = true) {}
 
         val sectionThree = object : Section<Pair<String, String>>(
                 2,
                 mutableListOf("One" to "1", "Two" to "2", "Three" to "3", "Four" to "4", "Five" to "5", "Six" to "6"),
-                ViewHolderData(R.layout.item_sample_three, { SampleViewHolderThree(it) }),
+                SectionedViewHolderData(R.layout.item_sample_three, { SampleViewHolderThree(it) }),
                 { type, item -> adapter?.removeItem(type, item) },
-                true) {}
+                hasHeader = true,
+                isCollapsible = true) {}
 
-        adapter = SampleAdapter(listOf(sectionOne, sectionTwo, sectionThree))
+        adapter = SampleAdapter(listOf(sectionOne, sectionTwo, sectionThree),
+                                { isCollapsed, type ->
+                                    if (isCollapsed)
+                                        adapter?.expandSection(type)
+                                    else
+                                        adapter?.collapseSection(type)
+                                })
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -77,15 +89,20 @@ class MultiViewHolderSampleActivity : AppCompatActivity() {
         return "Added"
     }
 
-    class SampleAdapter(sections: List<Section<*>>) :
-            MultiViewHolderAdapter(sections, ViewHolderData(R.layout.item_sample_section, { SectionViewHolder(it) }))
+    class SampleAdapter(sections: List<Section<*>>, val expand: (Boolean, Int) -> Unit) :
+            MultiViewHolderAdapter(sections,
+                                   SectionedViewHolderData(R.layout.item_sample_section, { SectionViewHolder(it, expand) }))
 
-    class SectionViewHolder(view: View) : ViewHolder<SectionData>(view) {
+    class SectionViewHolder(view: View, val expand: (Boolean, Int) -> Unit) : SectionedViewHolder<SectionData>(view) {
 
         val title by bind<TextView>(R.id.section_title)
         val count by bind<TextView>(R.id.section_item_count)
+        val chevron by bind<ImageView>(R.id.section_item_chevron)
 
         override fun bind(item: SectionData) {
+
+            chevron.onClick { expand(item.isCollapsed, item.type) }
+
             when (item.type) {
                 0 -> title.text = "String"
                 1 -> title.text = "Int"
@@ -93,10 +110,16 @@ class MultiViewHolderSampleActivity : AppCompatActivity() {
             }
 
             count.text = "${item.sectionCount}"
+
+            if (item.isCollapsed)
+                chevron.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_chevron_right))
+            else
+                chevron.setImageDrawable(ContextCompat.getDrawable(itemView.context, R.drawable.ic_chevron_down))
+
         }
     }
 
-    class SampleViewHolderOne(view: View) : ViewHolder<String>(view) {
+    class SampleViewHolderOne(view: View) : SectionedViewHolder<String>(view) {
 
         val text by bind<TextView>(R.id.sample_item_text)
 
@@ -107,7 +130,7 @@ class MultiViewHolderSampleActivity : AppCompatActivity() {
         }
     }
 
-    class SampleViewHolderTwo(view: View) : ViewHolder<Int>(view) {
+    class SampleViewHolderTwo(view: View) : SectionedViewHolder<Int>(view) {
 
         val text by bind<TextView>(R.id.sample_item_two_text)
 
@@ -118,7 +141,7 @@ class MultiViewHolderSampleActivity : AppCompatActivity() {
         }
     }
 
-    class SampleViewHolderThree(view: View) : ViewHolder<Pair<String, String>>(view) {
+    class SampleViewHolderThree(view: View) : SectionedViewHolder<Pair<String, String>>(view) {
 
         val textOne by bind<TextView>(R.id.item_sample_three_text_one)
         val textTwo by bind<TextView>(R.id.item_sample_three_text_two)

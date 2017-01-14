@@ -59,7 +59,10 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
 
             sectionSpans.put(section.type, SectionSpan(section.headerCount + offset, (section.count - 1) + section.headerCount + offset))
 
-            offset += section.count + section.headerCount
+            offset += section.headerCount
+
+            if (!section.isCollapsed)
+                offset += section.count
         }
     }
 
@@ -75,7 +78,7 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         return viewHolderType
     }
 
-    fun createViewHolder(parent: ViewGroup, sectionType: Int): ViewHolder<*> {
+    fun createViewHolder(parent: ViewGroup, sectionType: Int): SectionedViewHolder<*> {
         return getSectionForType(sectionType).viewHolderData.createViewHolder(parent)
     }
 
@@ -109,12 +112,34 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         return false
     }
 
-    fun bind(viewHolder: ViewHolder<*>, position: Int) {
+    fun bind(viewHolder: SectionedViewHolder<*>, position: Int) {
         getSectionForType(getSectionType(position)).bind(viewHolder, adjustPosition(position))
     }
 
-    fun bindHeader(viewHolder: ViewHolder<*>, position: Int) {
+    fun bindHeader(viewHolder: SectionedViewHolder<*>, position: Int) {
         getSectionForType(getHeaderSectionType(position)).bindHeader(viewHolder)
+    }
+
+    fun collapseSection(sectionType: Int) {
+        sections.firstOrNull { it.type == sectionType }?.isCollapsed = true
+
+            sectionSpans.get(sectionType)?.let {
+                updatePositions()
+
+//                adapter.notifyItemRangeChanged(it.start, it.end)
+                adapter.notifyDataSetChanged()
+            }
+    }
+
+    fun expandSection(sectionType: Int) {
+        sections.firstOrNull { it.type == sectionType }?.isCollapsed = false
+
+        sectionSpans.get(sectionType)?.let {
+            updatePositions()
+
+//            adapter.notifyItemRangeChanged(it.start, it.end)
+            adapter.notifyDataSetChanged()
+        }
     }
 
     fun addItem(sectionType: Int, item: Any) {
@@ -170,6 +195,8 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
             bindSectionHeader(sectionType)
         }
     }
+
+    class SectionData(val type: Int, val sectionCount: Int, val isCollapsed: Boolean)
 
     private class SectionSpan(val start: Int, val end: Int) {
 

@@ -10,11 +10,11 @@ import com.izeni.rapidocommon.view.inflate
  */
 abstract class ItemAdapter<T>(items: MutableList<T>,
                               @IdRes val layoutId: Int,
-                              val viewHolder: (View) -> ViewHolder<T>) :
+                              val viewHolder: (View) -> SectionedViewHolder<T>) :
         BaseAdapter<T>(items) {
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionedViewHolder<T> {
         return viewHolder(parent.inflate(layoutId))
     }
 }

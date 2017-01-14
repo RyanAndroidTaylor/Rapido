@@ -5,11 +5,15 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.izeni.rapidocommon.view.inflate
+import com.izeni.rapidocommon.recycler.SectionManager.SectionData
 
 /**
  * Created by ner on 1/2/17.
  */
-abstract class MultiViewHolderAdapter(sections: List<Section<*>>, private val sectionHeader: ViewHolderData<SectionData>? = null) : RecyclerView.Adapter<ViewHolder<*>>() {
+abstract class MultiViewHolderAdapter(sections: List<Section<*>>,
+                                      private val sectionHeader: SectionedViewHolderData<SectionData>? = null,
+                                      onClick: ((Int, SectionData) -> Unit)? = null) :
+        RecyclerView.Adapter<SectionedViewHolder<*>>() {
 
     companion object {
         val HEADER = -112
@@ -19,21 +23,23 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, private val se
 
     init {
         if (sectionHeader == null && sectionManager.hasHeaders())
-            throw IllegalStateException("One of your sections has a header but there was no ViewHolderData passed for section headers")
+            throw IllegalStateException("One of your sections has a header but there was no SectionedViewHolderData passed for section headers")
+
+        sectionHeader?.onClick = onClick
     }
 
     override fun getItemViewType(position: Int): Int {
         return sectionManager.getViewHolderType(position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<*> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionedViewHolder<*> {
         if (viewType == HEADER)
             return sectionHeader!!.createViewHolder(parent)
         else
             return sectionManager.createViewHolder(parent, viewType)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder<*>, position: Int) {
+    override fun onBindViewHolder(holder: SectionedViewHolder<*>, position: Int) {
         val type = getItemViewType(position)
 
         if (type == HEADER)
@@ -43,6 +49,15 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, private val se
     }
 
     override fun getItemCount() = sectionManager.count
+
+    fun collapseSection(sectionType: Int) {
+        sectionManager.collapseSection(sectionType)
+    }
+
+    fun expandSection(sectionType: Int) {
+        sectionManager.expandSection(sectionType)
+    }
+
 
     fun addItem(sectionType: Int, item: Any) {
         sectionManager.addItem(sectionType, item)
@@ -60,38 +75,48 @@ abstract class MultiViewHolderAdapter(sections: List<Section<*>>, private val se
         sectionManager.removeItem(sectionType, item)
     }
 
-    class ViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
+    class SectionedViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> SectionedViewHolder<T>) {
         var onClick: ((Int, T) -> Unit)? = null
+
+        fun createViewHolder(parent: ViewGroup): SectionedViewHolder<T> {
+            return viewHolder(parent.inflate(layoutId)).apply { this.onClick = this@SectionedViewHolderData.onClick }
+        }
+    }
+
+    class ViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
+        var onClick: ((T) -> Unit)? = null
 
         fun createViewHolder(parent: ViewGroup): ViewHolder<T> {
             return viewHolder(parent.inflate(layoutId)).apply { this.onClick = this@ViewHolderData.onClick }
         }
     }
 
-    class SectionData(val type: Int, val sectionCount: Int)
-
     @Suppress("UNCHECKED_CAST")
     abstract class Section<T>(val type: Int,
                               private val items: MutableList<T>,
-                              val viewHolderData: ViewHolderData<T>,
+                              val viewHolderData: SectionedViewHolderData<T>,
                               onClick: ((Int, T) -> Unit)? = null,
-                              val hasHeader: Boolean = false) {
+                              val hasHeader: Boolean = false,
+                              val isCollapsible: Boolean = false) {
 
         init {
             viewHolderData.onClick = onClick
         }
 
         val count: Int
-            get() = items.size
+            get() = if (isCollapsed) 0 else items.size
 
         val headerCount = if (hasHeader) 1 else 0
 
-        fun bind(viewHolder: ViewHolder<*>, position: Int) {
-            (viewHolder as ViewHolder<T>).bind(items[position])
+        var isCollapsed = false
+            set(value) { if (isCollapsible) field = value }
+
+        fun bind(viewHolder: SectionedViewHolder<*>, position: Int) {
+            (viewHolder as SectionedViewHolder<T>).bind(items[position])
         }
 
-        fun bindHeader(viewHolder: ViewHolder<*>) {
-            (viewHolder as ViewHolder<SectionData>).bind(SectionData(type, items.size))
+        fun bindHeader(viewHolder: SectionedViewHolder<*>) {
+            (viewHolder as SectionedViewHolder<SectionData>).bind(SectionData(type, items.size, isCollapsed))
         }
 
         fun addItem(item: Any) {

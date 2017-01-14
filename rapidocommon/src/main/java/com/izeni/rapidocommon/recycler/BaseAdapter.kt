@@ -5,13 +5,13 @@ import android.support.v7.widget.RecyclerView
 /**
  * Created by ner on 1/11/17.
  */
-abstract class BaseAdapter<T>(val items: MutableList<T>) : RecyclerView.Adapter<ViewHolder<T>>() {
+abstract class BaseAdapter<T>(val items: MutableList<T>) : RecyclerView.Adapter<SectionedViewHolder<T>>() {
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
+    override fun onBindViewHolder(holder: SectionedViewHolder<T>, position: Int) {
         holder.bind(items[position])
     }
 

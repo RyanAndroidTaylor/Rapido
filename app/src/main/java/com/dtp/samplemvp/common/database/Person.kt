@@ -34,18 +34,18 @@ data class Person(val uuid: String, val name: String, val pets: List<Pet>) : Par
 
     override fun tableName() = TABLE_NAME
 
-    override fun parentForeignKey() = uuid
+    override fun foreignKey() = uuid
 
     override fun contentValues(): ContentValues {
         return ContentValues().apply { addAll(COLUMNS, arrayOf(uuid, name)) }
     }
 
     class Builder : ItemBuilder<Person> {
-        override fun buildItem(cursor: Cursor): Person {
+        override fun buildItem(cursor: Cursor, dataConnection: DataConnection): Person {
             val personUuid = cursor.get<String>(UUID)
 
-            val pets = com.izeni.rapidosqlite.DataConnection.findAll(Pet.BUILDER,
-                                                                     QueryBuilder()
+            val pets = dataConnection.findAll(Pet.BUILDER,
+                                              QueryBuilder()
                                                       .with(Pet.TABLE_NAME)
                                                       .where(Pet.OWNER)
                                                       .equals(personUuid)

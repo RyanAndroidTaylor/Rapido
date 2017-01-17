@@ -2,6 +2,8 @@ package com.izeni.rapidosqlite
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.izeni.rapidosqlite.table.Column
 
 /**
@@ -39,4 +41,17 @@ fun ContentValues.addAll(columns: Array<Column>, values: Array<Any?>): ContentVa
     }
 
     return this
+}
+
+inline fun SQLiteDatabase.transaction(block: (SQLiteDatabase) -> Unit) {
+    beginTransaction()
+    try {
+        block(this)
+
+        setTransactionSuccessful()
+    } catch (e: Exception) {
+        Log.e("SqliteDatabase", e.message)
+    } finally {
+        endTransaction()
+    }
 }

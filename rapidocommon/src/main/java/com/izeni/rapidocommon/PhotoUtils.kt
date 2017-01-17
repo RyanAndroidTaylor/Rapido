@@ -12,7 +12,6 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.webkit.MimeTypeMap
-import com.izeni.rapidocommon.asInt
 import java.io.File
 import java.io.IOException
 import java.lang.Long
@@ -128,7 +127,7 @@ object PhotoUtils {
             val cursor = context.contentResolver.query(imageUri, columns, null, null, null) ?: return 0
 
             cursor.moveToFirst()
-            return cursor.asInt(MediaStore.Images.Media.ORIENTATION) ?: 0
+            return cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.ORIENTATION)) ?: 0
         } else {
             var id: String = ""
             DocumentsContract.getDocumentId(imageUri).split(":").let {
@@ -141,7 +140,7 @@ object PhotoUtils {
                                                        columns, MediaStore.Images.Media._ID + " = ?", arrayOf(id), null) ?: return 0
 
             cursor.moveToFirst()
-            return cursor.asInt(MediaStore.Images.Media.ORIENTATION) ?: 0
+            return cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.ORIENTATION)) ?: 0
         }
     }
 

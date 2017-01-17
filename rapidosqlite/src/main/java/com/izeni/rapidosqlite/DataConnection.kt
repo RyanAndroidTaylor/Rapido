@@ -13,33 +13,40 @@ import java.util.*
 /**
  * Created by ryantaylor on 9/22/16.
  */
-object DataConnection {
+class DataConnection(val database: SQLiteDatabase) {
+
+    companion object {
+        private lateinit var sqliteOpenHelper: SQLiteOpenHelper
+
+        fun init(databaseHelper: SQLiteOpenHelper) {
+            this.sqliteOpenHelper = databaseHelper
+        }
+
+        fun doAndClose(block: (DataConnection) -> Unit) {
+            val connection = DataConnection(sqliteOpenHelper.writableDatabase)
+
+            block(connection)
+
+            connection.close()
+        }
+
+        fun openConnection(): DataConnection {
+            return DataConnection(sqliteOpenHelper.writableDatabase)
+        }
+    }
 
     var conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE
 
-    private lateinit var sqliteOpenHelper: SQLiteOpenHelper
-
-    private val database: SQLiteDatabase
-        get() = sqliteOpenHelper.writableDatabase
-
-    fun init(databaseHelper: SQLiteOpenHelper) {
-        this.sqliteOpenHelper = databaseHelper
+    fun close() {
+        database.close()
     }
 
     fun save(item: DataTable) {
-        val database = database
-
-        save(item, database)
-
-        database.close()
+        database.transaction { save(item, it) }
     }
 
     fun saveAll(items: List<DataTable>) {
-        val database = this.database
-
-        items.forEach { save(it, database) }
-
-        database.close()
+        database.transaction { database -> items.forEach { save(it, database) } }
     }
 
     private fun save(item: DataTable, database: SQLiteDatabase) {
@@ -47,7 +54,7 @@ object DataConnection {
             val children = item.getChildren()
 
             for (child in children) {
-                child.setParentForeignKey(item.parentForeignKey())
+                child.setParentForeignKey(item.foreignKey())
 
                 database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
             }
@@ -61,19 +68,11 @@ object DataConnection {
      * update based on the id.
      */
     fun updateWithColumn(item: DataTable, column: Column, value: String) {
-        val database = database
-
-        database.update(item.tableName(), item.contentValues(), "${column.name} ?=", arrayOf(value))
-
-        database.close()
+        database.transaction { it.update(item.tableName(), item.contentValues(), "${column.name} ?=", arrayOf(value)) }
     }
 
     fun updateWithId(item: DataTable) {
-        val database = database
-
-        database.update(item.tableName(), item.contentValues(), Column.ID.name, arrayOf())
-
-        database.close()
+        database.transaction { it.update(item.tableName(), item.contentValues(), Column.ID.name, arrayOf()) }
     }
 
     /**
@@ -81,54 +80,42 @@ object DataConnection {
      * delete based on the id.
      */
     fun delete(item: DataTable, column: Column, value: String) {
-        val database = database
-
-        database.delete(item.tableName(), column.name, arrayOf(value))
-
-        database.close()
+        database.transaction { it.delete(item.tableName(), column.name, arrayOf(value)) }
     }
 
     /**
      * Delete everything for the table name that matches the column and value
      */
     fun deleteAll(tableName: String) {
-        val database = database
-
-        database.delete(tableName, null, null)
-
-        database.close()
+        database.transaction { it.delete(tableName, null, null) }
     }
 
     fun <T> findFirst(builder: ItemBuilder<T>, query: Query): T? {
-        val database = database
-
         var item: T? = null
 
-        val cursor = getCursor(database, query)
+        database.transaction {
+            val cursor = getCursor(database, query)
 
-        if (cursor.moveToFirst())
-            item = builder.buildItem(cursor)
+            if (cursor.moveToFirst())
+                item = builder.buildItem(cursor, this)
 
-        cursor.close()
-
-        database.close()
+            cursor.close()
+        }
 
         return item
     }
 
     fun <T> findAll(builder: ItemBuilder<T>, query: Query): List<T> {
-        val database = database
-
         val items = ArrayList<T>()
 
-        val cursor = getCursor(database, query)
+        database.transaction {
+            val cursor = getCursor(database, query)
 
-        while (cursor.moveToNext())
-            items.add(builder.buildItem(cursor))
+            while (cursor.moveToNext())
+                items.add(builder.buildItem(cursor, this))
 
-        cursor.close()
-
-        database.close()
+            cursor.close()
+        }
 
         return items
     }

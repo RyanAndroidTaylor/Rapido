@@ -2,6 +2,7 @@ package com.dtp.samplemvp.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
+import com.izeni.rapidosqlite.DataConnection
 import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.table.ChildDataTable
@@ -38,7 +39,7 @@ data class Pet(val uuid: String, val type: Int, var ownerUuid: String? = null) :
     }
 
     class Builder : ItemBuilder<Pet> {
-        override fun buildItem(cursor: Cursor): Pet {
+        override fun buildItem(cursor: Cursor, dataConnection: DataConnection): Pet {
             return Pet(cursor.get(UUID), cursor.get(TYPE), cursor.get(OWNER))
         }
     }

@@ -31,10 +31,12 @@ class SomeActivity: BaseActivity<SomeView, SomePresenter>(), SomeView {
 
         val person = Person("Person1", "Tim", listOf(dog, dogTwo, cat))
 
-        com.izeni.rapidosqlite.DataConnection.save(person)
+        DataConnection.doAndClose {
+            it.save(person)
 
-        val savedPerson = com.izeni.rapidosqlite.DataConnection.findFirst(Person.BUILDER, QueryBuilder().with(Person.TABLE_NAME).build())
+            val savedPerson = it.findFirst(Person.BUILDER, QueryBuilder().with(Person.TABLE_NAME).build())
 
-        Log.i("SomeActivity", "SavedPerson $savedPerson")
+            Log.i("SomeActivity", "SavedPerson $savedPerson")
+        }
     }
 }

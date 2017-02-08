@@ -47,8 +47,7 @@ data class Person(val uuid: String, val name: String, val pets: List<Pet>) : Par
             val pets = dataConnection.findAll(Pet.BUILDER,
                                               QueryBuilder()
                                                       .with(Pet.TABLE_NAME)
-                                                      .where(Pet.OWNER)
-                                                      .equals(personUuid)
+                                                      .whereEquals(Pet.OWNER, personUuid)
                                                       .build())
 
             return Person(personUuid, cursor.get(NAME), pets)

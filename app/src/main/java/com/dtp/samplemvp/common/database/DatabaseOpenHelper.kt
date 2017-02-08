@@ -13,10 +13,8 @@ class DatabaseOpenHelper(context: Context) : SQLiteOpenHelper(context, "com.dtp.
     override fun onCreate(db: SQLiteDatabase?) {
         val tableBuilder = TableBuilder()
 
-        val personTable = tableBuilder.buildTable(Person.TABLE_NAME, Person.COLUMNS)
-        val petTable = tableBuilder.buildTable(Pet.TABLE_NAME, Pet.COLUMNS)
-        db?.execSQL(personTable)
-        db?.execSQL(petTable)
+        db?.execSQL(tableBuilder.buildTable(Person.TABLE_NAME, Person.COLUMNS))
+        db?.execSQL(tableBuilder.buildTable(Pet.TABLE_NAME, Pet.COLUMNS))
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

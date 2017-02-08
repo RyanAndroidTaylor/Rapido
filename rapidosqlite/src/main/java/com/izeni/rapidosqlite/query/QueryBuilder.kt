@@ -1,6 +1,5 @@
 package com.izeni.rapidosqlite.query
 
-import com.izeni.rapidosqlite.query.Query
 import com.izeni.rapidosqlite.table.Column
 import java.util.*
 
@@ -27,6 +26,32 @@ class QueryBuilder {
     private var order: String? = null
     private var limit: String? = null
 
+    private var join: String? = null
+
+    private fun addToSelectionArgs(value: Any) {
+        when (value) {
+            is String -> selectionArgs.add(value)
+            is Int, is Long -> selectionArgs.add(value.toString())
+            is Boolean -> selectionArgs.add(if (value) "1" else "0")
+            else -> throw IllegalArgumentException("whereEquals only supports String, Int, Long and Boolean. value passed was $value")
+        }
+    }
+
+    private fun where(column: Column, value: Any, expression: String): QueryBuilder {
+        whereColumns.add(column.name)
+        whereOperators.add(expression)
+
+        addToSelectionArgs(value)
+
+        return this
+    }
+
+    fun join(join: String): QueryBuilder {
+        this.join = join
+
+        return this
+    }
+
     fun select(columns: Array<Column>): QueryBuilder {
         val columnStrings = Array(columns.size, { position -> columns[position].name })
 
@@ -41,45 +66,33 @@ class QueryBuilder {
         return this
     }
 
-    fun where(column: Column): QueryBuilder {
-        whereColumns.add(column.name)
-
-        return this
-    }
-
-    fun equals(value: String): QueryBuilder {
+    fun whereEquals(tableName: String, column: Column, value: Any): QueryBuilder {
+        whereColumns.add("$tableName.${column.name}")
         whereOperators.add(EQUALS)
-        selectionArgs.add(value)
+
+        addToSelectionArgs(value)
 
         return this
     }
 
-    fun lessThan(value: String): QueryBuilder {
-        whereOperators.add(LESS_THAN)
-        selectionArgs.add(value)
-
-        return this
+    fun whereEquals(column: Column, value: Any): QueryBuilder {
+        return where(column, value, EQUALS)
     }
 
-    fun lessThanOrEqual(value: String): QueryBuilder {
-        whereOperators.add(LESS_THAN_OR_EQUAL)
-        selectionArgs.add(value)
-
-        return this
+    fun whereLessThan(column: Column, value: Any): QueryBuilder {
+        return where(column, value, LESS_THAN)
     }
 
-    fun greaterThan(value: String): QueryBuilder {
-        whereOperators.add(GREATER_THAN)
-        selectionArgs.add(value)
-
-        return this
+    fun whereLessThanOrEqual(column: Column, value: Any): QueryBuilder {
+        return where(column, value, LESS_THAN_OR_EQUAL)
     }
 
-    fun greaterThanOrEqual(value: String): QueryBuilder {
-        whereOperators.add(GREATER_THAN_OR_EQUAL)
-        selectionArgs.add(value)
+    fun whereGreaterThan(column: Column, value: Any): QueryBuilder {
+        return where(column, value, GREATER_THAN)
+    }
 
-        return this
+    fun whereGreaterThanOrEqual(column: Column, value: Any): QueryBuilder {
+        return where(column, value, GREATER_THAN_OR_EQUAL)
     }
 
     fun or(column: Column): QueryBuilder {
@@ -115,6 +128,14 @@ class QueryBuilder {
     }
 
     fun build(): Query {
+        if (join != null) {
+            return buildRawQuery()
+        } else {
+            return buildQuery()
+        }
+    }
+
+    private fun buildQuery(): Query {
         insureValidQuery()
 
         var args: Array<String>? = null
@@ -123,6 +144,51 @@ class QueryBuilder {
             args = Array(selectionArgs.size, { position -> selectionArgs[position] })
         }
 
+        val selection = getSelectionString()
+
+        return Query(tableName!!, columns, selection, args, order, limit)
+    }
+
+    private fun buildRawQuery(): RawQuery {
+        join?.let { join ->
+            var rawQuery: String
+
+            if (columns != null) {
+                rawQuery = "SELECT "
+
+                columns!!.forEach {
+                    rawQuery += "$tableName.$it, "
+                }
+
+                rawQuery = rawQuery.trim(' ')
+                rawQuery = rawQuery.trim(',')
+
+                rawQuery += " FROM $join "
+            } else {
+                rawQuery = "SELECT * FROM $join "
+            }
+
+            if (whereColumns.size > 0) {
+                rawQuery += "WHERE "
+
+                whereColumns.forEach { rawQuery += "$it=?," }
+            }
+
+            rawQuery = rawQuery.trim(',')
+
+            var args: Array<String>? = null
+
+            if (selectionArgs.size > 0) {
+                args = Array(selectionArgs.size, { position -> selectionArgs[position] })
+            }
+
+            return RawQuery(rawQuery, args)
+        }
+
+        throw IllegalStateException("Join must not be null when building a raw query")
+    }
+
+    private fun getSelectionString(): String? {
         var selectionBuilder: StringBuilder? = null
 
         if (whereColumns.size > 0) {
@@ -137,9 +203,7 @@ class QueryBuilder {
             }
         }
 
-        val selection = selectionBuilder?.toString() ?: null
-
-        return Query(tableName!!, columns, selection, args, order, limit)
+        return selectionBuilder?.toString()
     }
 
     private fun insureValidQuery() {

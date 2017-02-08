@@ -10,9 +10,10 @@ import com.izeni.rapidocommon.recycler.SectionManager.SectionData
 /**
  * Created by ner on 1/2/17.
  */
-abstract class MultiViewHolderAdapter(sections: List<Section<*>>,
-                                      private val sectionHeader: SectionedViewHolderData<SectionData>? = null,
-                                      onClick: ((Int, SectionData) -> Unit)? = null) :
+//TODO Need to make it so section headers span the recycler view when using a GridLayoutManager
+abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
+                                         private val sectionHeader: SectionedViewHolderData<SectionData>? = null,
+                                         onClick: ((Int, SectionData) -> Unit)? = null) :
         RecyclerView.Adapter<SectionedViewHolder<*>>() {
 
     companion object {

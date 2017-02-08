@@ -8,7 +8,7 @@ import com.izeni.rapidocommon.e
 /**
  * Created by ner on 1/11/17.
  */
-class SectionManager(private val adapter: MultiViewHolderAdapter, private val sections: List<MultiViewHolderAdapter.Section<*>>) {
+class SectionManager(private val adapter: MultiViewSectionedAdapter, private val sections: List<MultiViewSectionedAdapter.Section<*>>) {
 
     private val sectionSpans = SparseArray<SectionSpan>()
     private val headers = SparseIntArray()
@@ -46,7 +46,7 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         }
     }
 
-    private fun getSectionForType(sectionType: Int): MultiViewHolderAdapter.Section<*> {
+    private fun getSectionForType(sectionType: Int): MultiViewSectionedAdapter.Section<*> {
         return sections.first { it.type == sectionType }
     }
 
@@ -72,7 +72,7 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         if (viewHolderType == -1) {
             (0..headers.size() - 1)
                     .filter { position == headers.valueAt(it) }
-                    .forEach { viewHolderType = MultiViewHolderAdapter.HEADER }
+                    .forEach { viewHolderType = MultiViewSectionedAdapter.HEADER }
         }
 
         return viewHolderType
@@ -126,7 +126,8 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
             sectionSpans.get(sectionType)?.let {
                 updatePositions()
 
-//                adapter.notifyItemRangeChanged(it.start, it.end)
+                //TODO When using notifyItemRangeRemoved the sections are not being marked as collapsed
+//                adapter.notifyItemRangeRemoved(it.start, it.end - it.start + 1)
                 adapter.notifyDataSetChanged()
             }
     }
@@ -137,7 +138,7 @@ class SectionManager(private val adapter: MultiViewHolderAdapter, private val se
         sectionSpans.get(sectionType)?.let {
             updatePositions()
 
-//            adapter.notifyItemRangeChanged(it.start, it.end)
+//            adapter.notifyItemRangeInserted(it.start, it.end - it.start)
             adapter.notifyDataSetChanged()
         }
     }

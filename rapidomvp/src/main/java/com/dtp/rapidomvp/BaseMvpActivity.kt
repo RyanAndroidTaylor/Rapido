@@ -1,21 +1,23 @@
-package com.dtp.samplemvp.common
+package com.dtp.rapidomvp
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import com.dtp.rapidomvp.presenter.Presenter
 import com.dtp.rapidomvp.view.ViewLayer
 
 /**
- * Created by ryantaylor on 10/8/16.
+ * Created by ner on 1/31/17.
  */
-open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
+abstract class BaseMvpActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
+
+    protected abstract val view: V
 
     lateinit var presenter: P
-    lateinit var view: V
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        presenter = createPresenter()
     }
 
     override fun onResume() {
@@ -33,8 +35,5 @@ open class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
             presenter.destroy()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-
-        super.onSaveInstanceState(outState, outPersistentState)
-    }
+    abstract fun createPresenter(): P
 }

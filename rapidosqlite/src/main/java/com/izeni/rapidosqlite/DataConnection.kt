@@ -1,10 +1,13 @@
 package com.izeni.rapidosqlite
 
+import android.annotation.SuppressLint
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.Query
+import com.izeni.rapidosqlite.query.RawQuery
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
@@ -20,6 +23,16 @@ class DataConnection(val database: SQLiteDatabase) {
 
         fun init(databaseHelper: SQLiteOpenHelper) {
             this.sqliteOpenHelper = databaseHelper
+        }
+
+        fun <T> getAndClose(block: (DataConnection) -> T): T {
+            val connection = DataConnection(sqliteOpenHelper.writableDatabase)
+
+            val items = block(connection)
+
+            connection.close()
+
+            return items
         }
 
         fun doAndClose(block: (DataConnection) -> Unit) {
@@ -56,8 +69,10 @@ class DataConnection(val database: SQLiteDatabase) {
             for (child in children) {
                 child.setParentForeignKey(item.foreignKey())
 
-                database.insertWithOnConflict(child.tableName(), null, child.contentValues(), conflictAlgorithm)
+                save(child, database)
             }
+
+            item.getJunctionTables()?.forEach { save(it, database) }
         }
 
         database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
@@ -111,8 +126,9 @@ class DataConnection(val database: SQLiteDatabase) {
         database.transaction {
             val cursor = getCursor(database, query)
 
-            while (cursor.moveToNext())
+            while (cursor.moveToNext()) {
                 items.add(builder.buildItem(cursor, this))
+            }
 
             cursor.close()
         }
@@ -120,7 +136,16 @@ class DataConnection(val database: SQLiteDatabase) {
         return items
     }
 
+    // Cursor should be closed in the block that calls this method
+    @SuppressLint("Recycle")
     fun getCursor(database: SQLiteDatabase, query: Query): Cursor {
-        return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
+        if (query is RawQuery) {
+            Log.i("DataConnection", "Raw query cursor \n ${query.query} \n ${query.selectionArgs?.get(0)}")
+            val cursor = database.rawQuery(query.query, query.selectionArgs)
+
+            return cursor
+        } else {
+            return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
+        }
     }
 }

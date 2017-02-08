@@ -1,9 +1,0 @@
-package com.dtp.samplemvp.some
-
-import com.dtp.rapidomvp.view.ViewLayer
-
-/**
- * Created by ner on 11/2/16.
- */
-interface SomeView : ViewLayer{
-}

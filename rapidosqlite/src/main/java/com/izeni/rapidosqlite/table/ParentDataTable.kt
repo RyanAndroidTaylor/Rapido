@@ -5,6 +5,5 @@ package com.izeni.rapidosqlite.table
  */
 interface ParentDataTable : DataTable {
     fun getJunctionTables(): List<JunctionDataTable>? = null
-    fun getChildren(): List<ChildDataTable>
-    fun foreignKey(): String
+    fun getChildren(): List<ChildDataTable>? = null
 }

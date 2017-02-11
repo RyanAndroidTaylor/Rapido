@@ -84,14 +84,6 @@ abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
         }
     }
 
-    class ViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> ViewHolder<T>) {
-        var onClick: ((T) -> Unit)? = null
-
-        fun createViewHolder(parent: ViewGroup): ViewHolder<T> {
-            return viewHolder(parent.inflate(layoutId)).apply { this.onClick = this@ViewHolderData.onClick }
-        }
-    }
-
     @Suppress("UNCHECKED_CAST")
     abstract class Section<T>(val type: Int,
                               private val items: MutableList<T>,

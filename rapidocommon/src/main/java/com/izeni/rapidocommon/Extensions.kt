@@ -2,10 +2,14 @@
 
 package com.izeni.rapidocommon
 
+import com.izeni.rapidocommon.errors.TransactionErrorHandler
+import com.izeni.rapidocommon.errors.ObservableFilterTransactionError
+import com.izeni.rapidocommon.errors.Transaction
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import java.util.LinkedList
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment
@@ -40,6 +44,16 @@ fun <T> Observable<T>.onMain(subScheduler: Scheduler? = null): Observable<T> =
 
 fun <T> Observable<T>.watchOnMain(watcher: (T) -> Unit): Disposable =
         onMain().doOnNext(watcher).onErrorResumeNext({ t: Throwable -> Observable.empty<T>() }).subscribe()
+
+fun runOnIo(block: () -> Unit): Disposable {
+    return Observable.just(Unit)
+            .observeOn(Schedulers.io())
+            .subscribe({ block() })
+}
+
+fun <T : Transaction<*, *>> Observable<T>.filterNetworkErrors(transactionErrorHandler: TransactionErrorHandler): Observable<T> {
+    return lift(ObservableFilterTransactionError(transactionErrorHandler))
+}
 
 fun String?.prepend(prepend: String) = if(isNullOrEmpty()) "" else "$prepend$this"
 fun String?.append(append: String) = if(isNullOrEmpty()) "" else "$this$append"

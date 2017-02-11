@@ -46,6 +46,18 @@ class QueryBuilder {
         return this
     }
 
+    fun with(tableName: String): QueryBuilder {
+        this.tableName = tableName
+
+        return this
+    }
+
+    fun all(tableName: String): Query {
+        this.tableName = tableName
+
+        return this.build()
+    }
+
     fun join(join: String): QueryBuilder {
         this.join = join
 
@@ -56,12 +68,6 @@ class QueryBuilder {
         val columnStrings = Array(columns.size, { position -> columns[position].name })
 
         this.columns = columnStrings
-
-        return this
-    }
-
-    fun with(tableName: String): QueryBuilder {
-        this.tableName = tableName
 
         return this
     }

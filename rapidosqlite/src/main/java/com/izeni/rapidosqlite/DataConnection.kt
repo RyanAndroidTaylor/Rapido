@@ -64,13 +64,7 @@ class DataConnection(val database: SQLiteDatabase) {
 
     private fun save(item: DataTable, database: SQLiteDatabase) {
         if (item is ParentDataTable) {
-            val children = item.getChildren()
-
-            for (child in children) {
-                child.setParentForeignKey(item.foreignKey())
-
-                save(child, database)
-            }
+            item.getChildren()?.forEach { save(it, database) }
 
             item.getJunctionTables()?.forEach { save(it, database) }
         }

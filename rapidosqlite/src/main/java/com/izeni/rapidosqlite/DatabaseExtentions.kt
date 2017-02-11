@@ -26,7 +26,7 @@ fun <T> Cursor.get(column: Column): T {
  * Returns content values where the values are stored base on the colulmns name.
  * The columns and values must be in the same order.
  */
-fun ContentValues.addAll(columns: Array<Column>, values: Array<Any?>): ContentValues {
+fun ContentValues.addAll(columns: Array<Column>, vararg values: Any?): ContentValues {
     for ((index, column) in columns.withIndex()) {
         val value = values[index]
         if (value != null) {
@@ -50,7 +50,7 @@ inline fun SQLiteDatabase.transaction(block: (SQLiteDatabase) -> Unit) {
 
         setTransactionSuccessful()
     } catch (e: Exception) {
-        Log.e("SqliteDatabase", e.message)
+        Log.e("DatabaseExtension", e.message)
     } finally {
         endTransaction()
     }

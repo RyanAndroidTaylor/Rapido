@@ -14,10 +14,10 @@ import com.izeni.rapidosqlite.table.Column
 @Suppress("UNCHECKED_CAST")
 fun <T> Cursor.get(column: Column): T {
     when (column.type) {
-        is String -> return getString(getColumnIndex(column.name)) as T
-        is Int -> return getInt(getColumnIndex(column.name)) as T
-        is Long -> return getLong(getColumnIndex(column.name)) as T
-        is Boolean -> return (getInt(getColumnIndex(column.name)) == 1) as T
+        String::class.java -> return getString(getColumnIndex(column.name)) as T
+        Int::class.java -> return getInt(getColumnIndex(column.name)) as T
+        Long::class.java -> return getLong(getColumnIndex(column.name)) as T
+        Boolean::class.java -> return (getInt(getColumnIndex(column.name)) == 1) as T
         else -> throw UnsupportedOperationException("${column.type} is not a supported type")
     }
 }
@@ -31,10 +31,10 @@ fun ContentValues.addAll(columns: Array<Column>, vararg values: Any?): ContentVa
         val value = values[index]
         if (value != null) {
             when (column.type) {
-                is String -> put(column.name, value as String)
-                is Int -> put(column.name, value as Int)
-                is Long -> put(column.name, value as Long)
-                is Boolean -> put(column.name, if ((value as Boolean)) 1 else 0)
+                String::class.java -> put(column.name, value as String)
+                Int::class.java -> put(column.name, value as Int)
+                Long::class.java -> put(column.name, value as Long)
+                Boolean::class.java -> put(column.name, if ((value as Boolean)) 1 else 0)
                 else -> throw IllegalArgumentException("${column.type} not supported by this method")
             }
         }

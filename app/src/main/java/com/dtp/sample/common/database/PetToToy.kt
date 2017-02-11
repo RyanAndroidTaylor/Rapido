@@ -3,6 +3,7 @@ package com.dtp.sample.common.database
 import android.content.ContentValues
 import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.table.Column
+import com.izeni.rapidosqlite.table.Column.Companion.LONG
 import com.izeni.rapidosqlite.table.JunctionDataTable
 
 /**
@@ -13,8 +14,8 @@ data class PetToToy(val petId: Long, val toyId: Long) : JunctionDataTable {
     companion object {
         val TABLE_NAME = "PetToToy"
 
-        val PET_ID = Column(Column.LONG, "PetId")
-        val TOY_ID = Column(Column.STRING, "ToyId")
+        val PET_ID = Column(LONG, "PetId")
+        val TOY_ID = Column(LONG, "ToyId")
 
         val COLUMNS = arrayOf(PET_ID, TOY_ID)
     }

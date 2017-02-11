@@ -6,6 +6,12 @@ import android.support.test.runner.AndroidJUnit4
 import com.dtp.DataHelper.Companion.personOneAge
 import com.dtp.DataHelper.Companion.personOneId
 import com.dtp.DataHelper.Companion.personOneName
+import com.dtp.DataHelper.Companion.petOneId
+import com.dtp.DataHelper.Companion.petOneName
+import com.dtp.DataHelper.Companion.toyOneId
+import com.dtp.DataHelper.Companion.toyOneName
+import com.dtp.sample.common.database.Person
+import com.dtp.sample.common.database.Toy
 import com.izeni.rapidosqlite.DataConnection
 import com.izeni.rapidosqlite.query.QueryBuilder
 import org.junit.After
@@ -45,7 +51,7 @@ class DataConnectionTest {
         dataHelper.saveFullPerson()
 
         DataConnection.doAndClose {
-            val person = it.findFirst(com.dtp.sample.common.database.Person.BUILDER, QueryBuilder().with(com.dtp.sample.common.database.Person.TABLE_NAME).build())
+            val person = it.findFirst(Person.BUILDER, QueryBuilder().with(Person.TABLE_NAME).build())
 
             assertNotNull(person)
 
@@ -53,25 +59,19 @@ class DataConnectionTest {
             assertEquals(personOneName, person?.name)
             assertEquals(personOneAge, person?.age)
 
-//            assertEquals(1, person?.pets?.size)
-//
-//            person?.pets?.get(0)?.let { pet ->
-//                assertEquals(personOneId, pet.foreignKey)
-//                assertEquals(petOneId, pet.id)
-//                assertEquals(petOneName, pet.name)
-//                assertEquals(1, pet.toys.size)
-//
-//                pet.toys[0].let { toy ->
-//                    assertEquals(toyOneId, toy.id)
-//                    assertEquals(toyOneName, toy.name)
-//                }
-//            }
+            assertEquals(1, person?.pets?.size)
 
-            val pet = it.findFirst(com.dtp.sample.common.database.Pet.BUILDER, QueryBuilder().all(com.dtp.sample.common.database.Pet.TABLE_NAME))
-            val toy = it.findFirst(com.dtp.sample.common.database.Toy.BUILDER, QueryBuilder().all(com.dtp.sample.common.database.Toy.TABLE_NAME))
+            person?.pets?.get(0)?.let { pet ->
+                assertEquals(personOneId, pet.foreignKey)
+                assertEquals(petOneId, pet.id)
+                assertEquals(petOneName, pet.name)
+                assertEquals(1, pet.toys.size)
 
-            assertNotNull(pet)
-            assertNotNull(toy)
+                pet.toys[0].let { toy ->
+                    assertEquals(toyOneId, toy.id)
+                    assertEquals(toyOneName, toy.name)
+                }
+            }
         }
     }
 }

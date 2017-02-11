@@ -57,10 +57,9 @@ class TableBuilder {
 
     private fun getColumnBuilder(column: Column): ColumnBuilder {
         when (column.type) {
-            is String -> return buildTextColumn(column.name)
-            is Int, is Long -> return buildIntColumn(column.name)
-            is Boolean -> return buildBooleanColumn(column.name)
-            is Any -> return buildBlobColumn(column.name)
+            String::class.java -> return buildTextColumn(column.name)
+            Int::class.java, Long::class.java -> return buildIntColumn(column.name)
+            Boolean::class.java -> return buildBooleanColumn(column.name)
             else -> throw UnsupportedOperationException("No ColumnBuilder found for type ${column.type}")
         }
     }

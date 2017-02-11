@@ -50,6 +50,7 @@ data class Pet(val id: Long, val foreignKey: Long, val name: String, val toys: L
                     .build()
 
             val query = QueryBuilder()
+                    .select(Toy.COLUMNS)
                     .with(Toy.TABLE_NAME)
                     .whereEquals(TABLE_NAME, ID, id)
                     .join(manyToMany)

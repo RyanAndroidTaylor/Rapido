@@ -33,7 +33,7 @@ data class Toy(val id: Long, val name: String) : ChildDataTable {
 
     class Builder : ItemBuilder<Toy> {
         override fun buildItem(cursor: Cursor, dataConnection: DataConnection): Toy {
-            return Toy(cursor.getLong(cursor.getColumnIndex("$TABLE_NAME.${ID.name}")), cursor.getString(cursor.getColumnIndex("$TABLE_NAME.${NAME.name}")))
+            return Toy(cursor.get(ID), cursor.get(NAME))
         }
     }
 }

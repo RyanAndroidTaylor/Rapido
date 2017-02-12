@@ -76,8 +76,15 @@ class DataConnection(val database: SQLiteDatabase) {
      * If column is not null update based on the column and value. If column is null
      * update based on the id.
      */
-    fun updateWithColumn(item: DataTable, column: Column, value: String) {
-        database.transaction { it.update(item.tableName(), item.contentValues(), "${column.name} ?=", arrayOf(value)) }
+    fun updateWithColumn(item: DataTable, column: Column, value: Any) {
+        val columnValue = when (value) {
+            is String -> value
+            is Int, is Long -> value.toString()
+            is Boolean -> if (value) "1" else "0"
+            else -> throw IllegalArgumentException("String, Int, Long and Boolean are the only supported types. You passed ${value.javaClass}")
+        }
+
+        database.transaction { it.update(item.tableName(), item.contentValues(), "${column.name}=?", arrayOf(columnValue)) }
     }
 
     fun updateWithId(item: DataTable) {
@@ -88,8 +95,14 @@ class DataConnection(val database: SQLiteDatabase) {
      * If column is not null delete based on the column and value. If column is null
      * delete based on the id.
      */
-    fun delete(item: DataTable, column: Column, value: String) {
-        database.transaction { it.delete(item.tableName(), column.name, arrayOf(value)) }
+    fun delete(tableName: String, column: Column, value: Any) {
+        val columnValue = when (value) {
+            is String -> value
+            is Int, is Long -> value.toString()
+            is Boolean -> if (value) "1" else "0"
+            else -> throw IllegalArgumentException("String, Int, Long and Boolean are the only supported types. You passed ${value.javaClass}")
+        }
+        database.transaction { it.delete(tableName, "${column.name}=?", arrayOf(columnValue)) }
     }
 
     /**
@@ -132,7 +145,7 @@ class DataConnection(val database: SQLiteDatabase) {
 
     // Cursor should be closed in the block that calls this method
     @SuppressLint("Recycle")
-    fun getCursor(database: SQLiteDatabase, query: Query): Cursor {
+    private fun getCursor(database: SQLiteDatabase, query: Query): Cursor {
         if (query is RawQuery) {
             Log.i("DataConnection", "Raw query cursor \n ${query.query} \n ${query.selectionArgs?.get(0)}")
             val cursor = database.rawQuery(query.query, query.selectionArgs)

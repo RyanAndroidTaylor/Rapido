@@ -1,4 +1,4 @@
-package com.dtp
+package com.izeni.rapidosqlite.util
 
 /**
  * Created by ner on 2/8/17.

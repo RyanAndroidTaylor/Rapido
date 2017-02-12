@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Created by ryantaylor on 9/23/16.
  */
-class QueryBuilder {
+class QueryBuilder private constructor() {
     private val EQUALS = " =? "
     private val LESS_THAN = " <? "
     private val LESS_THAN_OR_EQUAL = " <=?"
@@ -15,9 +15,9 @@ class QueryBuilder {
     private val OR = " OR "
     private val AND = " AND "
     private val ASCENDING = "ASC"
-    private val DESENDING = "DESC"
+    private val DESCENDING = "DESC"
 
-    private var tableName: String? = null
+    private lateinit var tableName: String
     private var columns: Array<String>? = null
     private var whereColumns = ArrayList<String>()
     private var whereOperators = ArrayList<String>()
@@ -25,8 +25,25 @@ class QueryBuilder {
     private var selectionArgs = ArrayList<String>()
     private var order: String? = null
     private var limit: String? = null
-
     private var join: String? = null
+
+    companion object {
+        fun with(tableName: String): QueryBuilder {
+            val queryBuilder = QueryBuilder()
+
+            queryBuilder.tableName = tableName
+
+            return queryBuilder
+        }
+
+        fun all(tableName: String): Query {
+            val queryBuilder = QueryBuilder()
+
+            queryBuilder.tableName = tableName
+
+            return queryBuilder.build()
+        }
+    }
 
     private fun addToSelectionArgs(value: Any) {
         when (value) {
@@ -46,25 +63,23 @@ class QueryBuilder {
         return this
     }
 
-    fun with(tableName: String): QueryBuilder {
-        this.tableName = tableName
-
-        return this
-    }
-
-    fun all(tableName: String): Query {
-        this.tableName = tableName
-
-        return this.build()
+    private fun throwAlreadySetError(valueName: String) {
+        throw IllegalStateException("$valueName for this query have already been set")
     }
 
     fun join(join: String): QueryBuilder {
+        if (this.join != null)
+            throwAlreadySetError("Join")
+
         this.join = join
 
         return this
     }
 
     fun select(columns: Array<Column>): QueryBuilder {
+        if (this.columns != null)
+            throwAlreadySetError("Columns")
+
         val columnStrings = Array(columns.size, { position -> columns[position].name })
 
         this.columns = columnStrings
@@ -116,24 +131,35 @@ class QueryBuilder {
     }
 
     fun ascending(column: Column): QueryBuilder {
+        if (this.order != null)
+            throwAlreadySetError("Order")
+
         this.order = "${column.name} $ASCENDING"
 
         return this
     }
 
     fun descending(column: Column): QueryBuilder {
-        this.order = "${column.name} $DESENDING"
+        if (this.order != null)
+            throwAlreadySetError("Order")
+
+        this.order = "${column.name} $DESCENDING"
 
         return this
     }
 
     fun limit(limit: Int): QueryBuilder {
+        if (this.limit != null)
+            throwAlreadySetError("Limit")
+
         this.limit = limit.toString()
 
         return this
     }
 
     fun build(): Query {
+        insureValidQuery()
+
         if (join != null) {
             return buildRawQuery()
         } else {
@@ -142,8 +168,6 @@ class QueryBuilder {
     }
 
     private fun buildQuery(): Query {
-        insureValidQuery()
-
         var args: Array<String>? = null
 
         if (selectionArgs.size > 0) {
@@ -152,17 +176,18 @@ class QueryBuilder {
 
         val selection = getSelectionString()
 
-        return Query(tableName!!, columns, selection, args, order, limit)
+        return Query(tableName, columns, selection, args, order, limit)
     }
 
     private fun buildRawQuery(): RawQuery {
+        //TODO Need to allow order and limit on raw queries
         join?.let { join ->
             var rawQuery: String
 
             if (columns != null) {
                 rawQuery = "SELECT "
 
-                columns!!.forEach {
+                columns?.forEach {
                     rawQuery += "$tableName.$it, "
                 }
 
@@ -213,7 +238,9 @@ class QueryBuilder {
     }
 
     private fun insureValidQuery() {
-        if (whereColumns.size != whereOperators.size)
-            throw IllegalStateException("There were not equal numbers of whereColumns and whereOperators")
+        if (whereColumns.size > 1 && whereCombinds.size <= whereColumns.size)
+            throw IllegalStateException("All \"WHERE\" expressions need to be separated by a \"AND\" or an \"OR\"")
+        if (whereCombinds.size > whereColumns.size + 1)
+            throw IllegalStateException("Queries can't end with a \"AND\" or an \"OR\"")
     }
 }

@@ -1,7 +1,8 @@
-package com.dtp.sample.common.database
+package com.izeni.rapidosqlite.util
 
 import android.content.ContentValues
 import android.database.Cursor
+import com.izeni.rapidosqlite.util.Pet
 import com.izeni.rapidosqlite.DataConnection
 import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.get

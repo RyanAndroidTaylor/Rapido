@@ -45,7 +45,7 @@ class RxActivity : AppCompatActivity() {
         val subject: BehaviorSubject<Transaction<List<Person>, Unit>> = BehaviorSubject.create()
 
         runOnIo {
-            val query = QueryBuilder().all(Person.TABLE_NAME)
+            val query = QueryBuilder.all(Person.TABLE_NAME)
 
             val people = DataConnection.getAndClose { it.findAll(Person.BUILDER, query) }
 

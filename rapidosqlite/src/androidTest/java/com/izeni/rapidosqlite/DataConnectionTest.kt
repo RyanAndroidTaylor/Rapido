@@ -1,24 +1,20 @@
-package com.dtp
+package com.izeni.rapidosqlite
 
 import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import com.dtp.DataHelper.personOneAge
-import com.dtp.DataHelper.personOneId
-import com.dtp.DataHelper.personOneName
-import com.dtp.DataHelper.petOneId
-import com.dtp.DataHelper.petOneName
-import com.dtp.DataHelper.toyOneId
-import com.dtp.DataHelper.toyOneName
-import com.dtp.DataHelper.toyTwoId
-import com.dtp.DataHelper.toyTwoName
-import com.dtp.sample.common.database.Person
-import com.dtp.sample.common.database.Pet
-import com.dtp.sample.common.database.PetToToy
-import com.dtp.sample.common.database.Toy
-import com.izeni.rapidosqlite.DataConnection
-import com.izeni.rapidosqlite.query.QueryBuilder
+import com.izeni.rapidosqlite.query.Query
+import com.izeni.rapidosqlite.util.*
+import com.izeni.rapidosqlite.util.DataHelper.personOneAge
+import com.izeni.rapidosqlite.util.DataHelper.personOneId
+import com.izeni.rapidosqlite.util.DataHelper.personOneName
+import com.izeni.rapidosqlite.util.DataHelper.petOneId
+import com.izeni.rapidosqlite.util.DataHelper.petOneName
+import com.izeni.rapidosqlite.util.DataHelper.toyOneId
+import com.izeni.rapidosqlite.util.DataHelper.toyOneName
+import com.izeni.rapidosqlite.util.DataHelper.toyTwoId
+import com.izeni.rapidosqlite.util.DataHelper.toyTwoName
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -59,7 +55,9 @@ class DataConnectionTest {
 
             it.save(toy)
 
-            val savedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val savedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(savedToy)
 
@@ -75,7 +73,9 @@ class DataConnectionTest {
 
             it.save(toy)
 
-            var toys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            var toys = it.findAll(Toy.BUILDER, query)
 
             assertNotNull(toys)
             assertEquals(toys.size, 1)
@@ -89,7 +89,7 @@ class DataConnectionTest {
 
             it.save(toyTwo)
 
-            toys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            toys = it.findAll(Toy.BUILDER, query)
 
             assertNotNull(toys)
             assertEquals(toys.size, 2)
@@ -114,7 +114,9 @@ class DataConnectionTest {
 
             it.saveAll(listOf(toyOne, toyTwo))
 
-            val toys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val toys = it.findAll(Toy.BUILDER, query)
 
             assertEquals(2, toys.size)
 
@@ -139,7 +141,9 @@ class DataConnectionTest {
 
             it.save(person)
 
-            val loadedPerson = it.findFirst(Person.BUILDER, QueryBuilder().with(Person.TABLE_NAME).build())
+            val query = Query(Person.TABLE_NAME, null, null, null, null, null)
+
+            val loadedPerson = it.findFirst(Person.BUILDER, query)
 
             assertNotNull(loadedPerson)
 
@@ -170,7 +174,9 @@ class DataConnectionTest {
 
             it.save(toy)
 
-            val savedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val savedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(savedToy)
             assertEquals(toyOneId, savedToy?.id)
@@ -180,12 +186,12 @@ class DataConnectionTest {
 
             it.updateWithId(toyTwo)
 
-            val updatedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val updatedToy = it.findFirst(Toy.BUILDER, query)
 
             assertEquals(toyOneId, updatedToy?.id)
             assertEquals(toyTwoName, updatedToy?.name)
 
-            val allToys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val allToys = it.findAll(Toy.BUILDER, query)
 
             assertEquals(1, allToys.size)
         }
@@ -198,7 +204,9 @@ class DataConnectionTest {
 
             it.save(toy)
 
-            val savedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val savedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(savedToy)
             assertEquals(toyOneId, savedToy?.id)
@@ -208,12 +216,12 @@ class DataConnectionTest {
 
             it.updateWithColumn(toyTwo, Toy.ID, toyOneId)
 
-            val updatedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val updatedToy = it.findFirst(Toy.BUILDER, query)
 
             assertEquals(toyOneId, updatedToy?.id)
             assertEquals(toyTwoName, updatedToy?.name)
 
-            val allToys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val allToys = it.findAll(Toy.BUILDER, query)
 
             assertEquals(1, allToys.size)
         }
@@ -226,13 +234,15 @@ class DataConnectionTest {
 
             it.save(toy)
 
-            val loadedToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val loadedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(loadedToy)
 
             it.delete(Toy.TABLE_NAME, Toy.ID, toyOneId)
 
-            val loadedAfterDeleteToy = it.findFirst(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val loadedAfterDeleteToy = it.findFirst(Toy.BUILDER, query)
 
             assertEquals(null, loadedAfterDeleteToy)
         }
@@ -243,13 +253,15 @@ class DataConnectionTest {
         DataConnection.doAndClose {
             it.saveAll(listOf(Toy(toyOneId, toyOneName), Toy(toyTwoId, toyTwoName)))
 
-            val loadedToys = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val loadedToys = it.findAll(Toy.BUILDER, query)
 
             assertEquals(2, loadedToys.size)
 
             it.deleteAll(Toy.TABLE_NAME)
 
-            val loadedAfterDelete = it.findAll(Toy.BUILDER, QueryBuilder().all(Toy.TABLE_NAME))
+            val loadedAfterDelete = it.findAll(Toy.BUILDER, query)
 
             assertEquals(0, loadedAfterDelete.size)
         }

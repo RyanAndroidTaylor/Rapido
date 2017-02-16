@@ -144,4 +144,115 @@ class QueryBuilderTest {
         assertNull(query.limit)
         assertNull(query.order)
     }
+
+    @Test
+    fun testWhereEqualsWithTableName() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereEquals(Toy.TABLE_NAME, Toy.ID, 12345)
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "${Toy.TABLE_NAME}.Id =? ")
+        assertEquals(1, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
+
+    @Test
+    fun testWhereLessThan() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereLessThan(Toy.ID, 12345)
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "Id <? ")
+        assertEquals(1, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
+
+    @Test
+    fun whereLessThanOrEqualTo() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereLessThanOrEqual(Toy.ID, 12345)
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "Id <=? ")
+        assertEquals(1, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
+
+    @Test
+    fun testWhereGreaterThan() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereGreaterThan(Toy.ID, 12345)
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "Id >? ")
+        assertEquals(1, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
+
+    @Test
+    fun testWhereGreaterThanOrEqualTo() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereGreaterThanOrEqual(Toy.ID, 12345)
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "Id >=? ")
+        assertEquals(1, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
+
+    @Test
+    fun testOr() {
+        val query = QueryBuilder
+                .with(Toy.TABLE_NAME)
+                .whereEquals(Toy.ID, 12345)
+                .or()
+                .whereGreaterThan(Toy.NAME, "123")
+                .build()
+
+        assertEquals(query.tableName, Toy.TABLE_NAME)
+        assertNull(query.columns)
+
+        assertEquals(query.selection, "${Toy.ID.name} =?  OR ${Toy.NAME.name} >? ")
+        assertEquals(2, query.selectionArgs?.size)
+        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals("123", query.selectionArgs?.get(1))
+
+        assertNull(query.limit)
+        assertNull(query.order)
+    }
 }

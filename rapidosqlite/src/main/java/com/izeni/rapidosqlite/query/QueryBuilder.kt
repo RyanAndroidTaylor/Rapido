@@ -9,7 +9,7 @@ import java.util.*
 class QueryBuilder private constructor() {
     private val EQUALS = " =? "
     private val LESS_THAN = " <? "
-    private val LESS_THAN_OR_EQUAL = " <=?"
+    private val LESS_THAN_OR_EQUAL = " <=? "
     private val GREATER_THAN = " >? "
     private val GREATER_THAN_OR_EQUAL = " >=? "
     private val OR = " OR "
@@ -116,16 +116,14 @@ class QueryBuilder private constructor() {
         return where(column, value, GREATER_THAN_OR_EQUAL)
     }
 
-    fun or(column: Column): QueryBuilder {
+    fun or(): QueryBuilder {
         whereCombinds.add(OR)
-        whereColumns.add(column.name)
 
         return this
     }
 
-    fun and(column: Column): QueryBuilder {
+    fun and(): QueryBuilder {
         whereCombinds.add(AND)
-        whereColumns.add(column.name)
 
         return this
     }
@@ -238,7 +236,7 @@ class QueryBuilder private constructor() {
     }
 
     private fun insureValidQuery() {
-        if (whereColumns.size > 1 && whereCombinds.size <= whereColumns.size)
+        if (whereColumns.size > 1 && whereCombinds.size != whereColumns.size - 1)
             throw IllegalStateException("All \"WHERE\" expressions need to be separated by a \"AND\" or an \"OR\"")
         if (whereCombinds.size > whereColumns.size + 1)
             throw IllegalStateException("Queries can't end with a \"AND\" or an \"OR\"")

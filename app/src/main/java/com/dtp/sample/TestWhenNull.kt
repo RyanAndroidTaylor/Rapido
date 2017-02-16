@@ -1,6 +1,7 @@
 package com.dtp.sample
 
 import com.izeni.rapidocommon.d
+import com.izeni.rapidocommon.ifNull
 import com.izeni.rapidocommon.whenNull
 
 /**
@@ -12,12 +13,16 @@ class TestWhenNull {
 
     fun test() {
         testOne?.let {
-            d("testOne is not null")
+            d("testOne is null but still ran the let")
         } ?: whenNull {
             d("testOne is null and ?: whenNull works")
         }
 
+        testOne.ifNull { d("\"ifNull\" testOne is null") }
+
         testOne = "Set to not null"
+
+        testOne.ifNull { d("\"ifNull\" testOne is not null. This should not print") }
 
         testOne?.let {
             d(it)

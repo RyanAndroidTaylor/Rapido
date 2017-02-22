@@ -5,7 +5,7 @@ import com.izeni.rapidosqlite.table.Column
 /**
  * Created by ner on 2/8/17.
  */
-class ManyToMany {
+class ManyToMany : Join() {
 
     private lateinit var returnTableName: String
     private lateinit var returnTableColumn: String
@@ -16,14 +16,6 @@ class ManyToMany {
     private lateinit var junctionTableName: String
     private lateinit var junctionToReturnConnection: String
     private lateinit var junctionToJoinConnection: String
-
-    private val stringBuilder = StringBuilder()
-
-    private val leftJoin = " LEFT JOIN "
-    private val on = " ON "
-    private val space = " "
-    private val period = "."
-    private val equals = " = "
 
     fun returnTable(tableName: String, column: Column): ManyToMany {
         returnTableName = tableName

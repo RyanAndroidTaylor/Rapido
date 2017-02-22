@@ -26,6 +26,9 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$support_version"
 
+    compile "io.reactivex.rxjava2:rxjava:$rx2_version"
+    compile "io.reactivex.rxjava2:rxandroid:$rx2_version"
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     testCompile 'junit:junit:4.12'

@@ -12,6 +12,7 @@ class QueryBuilder private constructor() {
     private val LESS_THAN_OR_EQUAL = " <=? "
     private val GREATER_THAN = " >? "
     private val GREATER_THAN_OR_EQUAL = " >=? "
+    private val LIKE = " LIKE ?"
     private val OR = " OR "
     private val AND = " AND "
     private val ASCENDING = "ASC"
@@ -114,6 +115,18 @@ class QueryBuilder private constructor() {
 
     fun whereGreaterThanOrEqual(column: Column, value: Any): QueryBuilder {
         return where(column, value, GREATER_THAN_OR_EQUAL)
+    }
+
+    fun contains(column: Column, value: Any): QueryBuilder {
+        return where(column, "%$value$", LIKE)
+    }
+
+    fun startsWith(column: Column, value: Any): QueryBuilder {
+        return where(column, "$value%", LIKE)
+    }
+
+    fun endsWith(column: Column, value: Any): QueryBuilder {
+        return where(column, "%$value", LIKE)
     }
 
     fun or(): QueryBuilder {

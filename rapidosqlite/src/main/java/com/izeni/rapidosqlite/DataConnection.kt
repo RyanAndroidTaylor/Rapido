@@ -12,13 +12,16 @@ import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by ryantaylor on 9/22/16.
  */
-class DataConnection(val database: SQLiteDatabase) {
+class DataConnection private constructor(val database: SQLiteDatabase) {
 
     companion object {
+        private var connectionCount: AtomicInteger = AtomicInteger(0)
+
         private lateinit var sqliteOpenHelper: SQLiteOpenHelper
 
         fun init(databaseHelper: SQLiteOpenHelper) {
@@ -26,25 +29,27 @@ class DataConnection(val database: SQLiteDatabase) {
         }
 
         fun <T> getAndClose(block: (DataConnection) -> T): T {
+            connectionCount.incrementAndGet()
+
             val connection = DataConnection(sqliteOpenHelper.writableDatabase)
 
             val items = block(connection)
 
-            connection.close()
+            if (connectionCount.decrementAndGet() < 1)
+                connection.close()
 
             return items
         }
 
         fun doAndClose(block: (DataConnection) -> Unit) {
+            connectionCount.incrementAndGet()
+
             val connection = DataConnection(sqliteOpenHelper.writableDatabase)
 
             block(connection)
 
-            connection.close()
-        }
-
-        fun openConnection(): DataConnection {
-            return DataConnection(sqliteOpenHelper.writableDatabase)
+            if (connectionCount.decrementAndGet() < 1)
+                connection.close()
         }
     }
 
@@ -52,6 +57,7 @@ class DataConnection(val database: SQLiteDatabase) {
 
     fun close() {
         database.close()
+
     }
 
     fun save(item: DataTable) {

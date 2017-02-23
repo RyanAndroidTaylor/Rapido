@@ -11,7 +11,10 @@ import com.izeni.rapidosqlite.query.RawQuery
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -20,7 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger
 class DataConnection private constructor(val database: SQLiteDatabase) {
 
     companion object {
-        private var connectionCount: AtomicInteger = AtomicInteger(0)
+        private val connectionCount = AtomicInteger()
+
+        private val databaseExecutor = Executors.newSingleThreadExecutor()
 
         private lateinit var sqliteOpenHelper: SQLiteOpenHelper
 
@@ -28,36 +33,69 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
             this.sqliteOpenHelper = databaseHelper
         }
 
-        fun <T> getAndClose(block: (DataConnection) -> T): T {
-            connectionCount.incrementAndGet()
+        fun <T> asyncGetAndClose(block: (DataConnection) -> T): Observable<T> {
+            Log.i("DataConnection", "Called on thread: ${Thread.currentThread().name}")
 
-            val connection = DataConnection(sqliteOpenHelper.writableDatabase)
+            return Observable.just(Unit)
+                    .subscribeOn(Schedulers.from(databaseExecutor))
+                    .map {
+                        Log.i("DataConnection", "Executed on thread: ${Thread.currentThread().name}")
+                        val connection = openConnection()
+
+                        val items = block(connection)
+
+                        connection.close()
+
+                        items
+                    }
+        }
+
+        fun <T> getAndClose(block: (DataConnection) -> T): T {
+            val connection = openConnection()
 
             val items = block(connection)
 
-            if (connectionCount.decrementAndGet() < 1)
-                connection.close()
+            connection.close()
 
             return items
         }
 
-        fun doAndClose(block: (DataConnection) -> Unit) {
-            connectionCount.incrementAndGet()
+        fun asyncDoAndClose(block: (DataConnection) -> Unit): Observable<Unit> {
+            Log.i("DataConnection", "Executed on thread: ${Thread.currentThread().name}")
 
-            val connection = DataConnection(sqliteOpenHelper.writableDatabase)
+            return Observable.just(Unit)
+                    .subscribeOn(Schedulers.from(databaseExecutor))
+                    .map {
+                        Log.i("DataConnection", "Current Thread is: ${Thread.currentThread().name}")
+
+                        val connection = openConnection()
+
+                        block(connection)
+
+                        connection.close()
+                    }
+        }
+
+        fun doAndClose(block: (DataConnection) -> Unit) {
+            val connection = openConnection()
 
             block(connection)
 
-            if (connectionCount.decrementAndGet() < 1)
-                connection.close()
+            connection.close()
+        }
+
+        private fun openConnection(): DataConnection {
+            connectionCount.incrementAndGet()
+
+            return DataConnection(sqliteOpenHelper.writableDatabase)
         }
     }
 
     var conflictAlgorithm = SQLiteDatabase.CONFLICT_REPLACE
 
     fun close() {
-        database.close()
-
+        if (connectionCount.decrementAndGet() < 1)
+            database.close()
     }
 
     fun save(item: DataTable) {
@@ -153,10 +191,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
     @SuppressLint("Recycle")
     private fun getCursor(database: SQLiteDatabase, query: Query): Cursor {
         if (query is RawQuery) {
-            Log.i("DataConnection", "Raw query cursor \n ${query.query} \n ${query.selectionArgs?.get(0)}")
-            val cursor = database.rawQuery(query.query, query.selectionArgs)
-
-            return cursor
+            return database.rawQuery(query.query, query.selectionArgs)
         } else {
             return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
         }

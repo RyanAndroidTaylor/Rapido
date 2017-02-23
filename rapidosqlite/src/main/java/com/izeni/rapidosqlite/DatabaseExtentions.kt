@@ -43,15 +43,19 @@ fun ContentValues.addAll(columns: Array<Column>, vararg values: Any?): ContentVa
     return this
 }
 
-inline fun SQLiteDatabase.transaction(block: (SQLiteDatabase) -> Unit) {
+inline fun SQLiteDatabase.transaction(block: (SQLiteDatabase) -> Unit): Boolean {
     beginTransaction()
     try {
         block(this)
 
         setTransactionSuccessful()
+
+        return true
     } catch (e: Exception) {
         Log.e("DatabaseExtension", e.message)
     } finally {
         endTransaction()
     }
+
+    return false
 }

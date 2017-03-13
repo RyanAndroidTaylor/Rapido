@@ -8,16 +8,16 @@ import com.izeni.rapidosqlite.get
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.ManyToMany
 import com.izeni.rapidosqlite.query.QueryBuilder
-import com.izeni.rapidosqlite.table.ChildDataTable
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.Column.Companion.LONG
 import com.izeni.rapidosqlite.table.Column.Companion.STRING
+import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 
 /**
  * Created by ner on 2/8/17.
  */
-data class Pet(val id: Long, val foreignKey: Long, val name: String, val toys: List<Toy>) : ParentDataTable, ChildDataTable {
+data class Pet(val id: Long, val foreignKey: Long, val name: String, val toys: List<Toy>) : ParentDataTable {
 
     companion object {
         val TABLE_NAME = "Pet"
@@ -35,9 +35,14 @@ data class Pet(val id: Long, val foreignKey: Long, val name: String, val toys: L
 
     override fun contentValues() = ContentValues().addAll(COLUMNS, id, foreignKey, name)
 
-    override fun getJunctionTables() = toys.map { PetToToy(id, it.id) }
+    override fun getChildren(): List<DataTable> {
+        val children = mutableListOf<DataTable>()
 
-    override fun getChildren() = toys
+        children.addAll(toys)
+        children.addAll(toys.map { PetToToy(id, it.id) })
+
+        return children
+    }
 
     class Builder : ItemBuilder<Pet> {
         override fun buildItem(cursor: Cursor, dataConnection: DataConnection): Pet {

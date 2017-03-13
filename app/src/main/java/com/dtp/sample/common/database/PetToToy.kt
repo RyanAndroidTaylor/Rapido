@@ -4,12 +4,12 @@ import android.content.ContentValues
 import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.Column.Companion.LONG
-import com.izeni.rapidosqlite.table.JunctionDataTable
+import com.izeni.rapidosqlite.table.DataTable
 
 /**
  * Created by ner on 2/8/17.
  */
-data class PetToToy(val petId: Long, val toyId: Long) : JunctionDataTable {
+data class PetToToy(val petId: Long, val toyId: Long) : DataTable {
 
     companion object {
         val TABLE_NAME = "PetToToy"

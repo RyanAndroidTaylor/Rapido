@@ -237,7 +237,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneId, toyTwoName)
 
-            it.updateWithId(toyTwo)
+            it.updateForColumn(toyTwo, Toy.ID, toyTwo.id)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
@@ -269,7 +269,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneId, toyTwoName)
 
-            it.updateWithColumn(toyTwo, Toy.ID, toyOneId)
+            it.updateForColumn(toyTwo, Toy.ID, toyOneId)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 

@@ -28,7 +28,7 @@ class RxActivity : AppCompatActivity() {
 
         loadPeople()
                 .observeOn(AndroidSchedulers.mainThread())
-                .filterNetworkErrors(TransactionErrorHandler(this, { d("If there is something else you would like to do when this fails do it here.") }))
+                .filterNetworkErrors()
                 .subscribe {
                     if (it is Transaction.Success)
                         it.value.forEach { d("Person $it") }

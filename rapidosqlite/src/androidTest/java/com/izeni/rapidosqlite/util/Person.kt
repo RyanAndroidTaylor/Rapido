@@ -8,7 +8,6 @@ import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.get
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.QueryBuilder
-import com.izeni.rapidosqlite.table.ChildDataTable
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.Column.Companion.INT
 import com.izeni.rapidosqlite.table.Column.Companion.LONG

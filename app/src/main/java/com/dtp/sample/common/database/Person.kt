@@ -2,12 +2,12 @@ package com.dtp.sample.common.database
 
 import android.content.ContentValues
 import android.database.Cursor
+import com.google.gson.annotations.SerializedName
 import com.izeni.rapidosqlite.DataConnection
 import com.izeni.rapidosqlite.addAll
 import com.izeni.rapidosqlite.get
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.QueryBuilder
-import com.izeni.rapidosqlite.table.ChildDataTable
 import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.Column.Companion.INT
 import com.izeni.rapidosqlite.table.Column.Companion.LONG
@@ -24,7 +24,7 @@ data class Person(val id: Long, val name: String, val age: Int, val pets: List<P
 
         val ID = Column(LONG, "Id", notNull = true, unique = true)
         val NAME = Column(STRING, "Name", notNull = true)
-        val AGE = Column(INT, "Age", notNull = true)
+        val AGE = Column(INT, "Age", notNull = true, defaultValue = 38)
 
         val COLUMNS = arrayOf(ID, NAME, AGE)
 

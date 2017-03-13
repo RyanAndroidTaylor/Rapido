@@ -7,21 +7,21 @@ import io.reactivex.disposables.Disposable
 /**
  * Created by ner on 11/20/16.
  */
-class ObservableFilterTransactionError<T: Transaction<*, *>>(val transactionErrorHandler: TransactionErrorHandler) : ObservableOperator<T, T> {
-    override fun apply(observer: Observer<in T>?): Observer<in T> {
+class ObservableFilterTransactionError<T, P>() : ObservableOperator<Transaction<T, P>, Transaction<T, P>> {
+    override fun apply(observer: Observer<in Transaction<T, P>>?): Observer<in Transaction<T, P>> {
         return Op(observer)
     }
 
 
-    inner class Op(val child: Observer<in T>?) : Observer<T>, Disposable {
+    inner class Op(val child: Observer<in Transaction<T, P>>?) : Observer<Transaction<T, P>>, Disposable {
 
         var disposable: Disposable? = null
 
-        override fun onNext(t: T) {
-            when (t) {
-                is Transaction.Failure<*, *> -> transactionErrorHandler.handleError(t.error)
-                else -> child?.onNext(t)
-            }
+        override fun onNext(t: Transaction<T, P>) {
+            if (t is Transaction.Failure<*, *>)
+                TransactionErrorHandler.handleError(t.error)
+
+            child?.onNext(t)
         }
 
         override fun onSubscribe(d: Disposable?) {
@@ -35,7 +35,11 @@ class ObservableFilterTransactionError<T: Transaction<*, *>>(val transactionErro
         }
 
         override fun onError(t: Throwable?) {
-            transactionErrorHandler.handleError(ThrowableError(t))
+            val error = TransactionErrorParser.parseError(t)
+
+            TransactionErrorHandler.handleError(error)
+
+            child?.onNext(Transaction.Failure<T, P>(error))
         }
 
         override fun isDisposed(): Boolean {

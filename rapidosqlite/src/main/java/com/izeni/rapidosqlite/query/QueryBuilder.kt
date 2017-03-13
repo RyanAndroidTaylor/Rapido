@@ -118,7 +118,7 @@ class QueryBuilder private constructor() {
     }
 
     fun contains(column: Column, value: Any): QueryBuilder {
-        return where(column, "%$value$", LIKE)
+        return where(column, "%$value%", LIKE)
     }
 
     fun startsWith(column: Column, value: Any): QueryBuilder {

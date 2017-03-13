@@ -29,11 +29,10 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     compile "com.android.support:appcompat-v7:$support_version"
-
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
     compile "com.android.support:recyclerview-v7:$support_version"
     compile "com.android.support:design:$support_version"
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     compile "com.android.support.constraint:constraint-layout:$constraint_version"
 
@@ -52,9 +51,6 @@ dependencies {
 
     compile "com.afollestad.material-dialogs:core:$material_dialogs_version"
     compile "com.afollestad.material-dialogs:commons:$material_dialogs_version"
-
-    compile "io.reactivex.rxjava2:rxandroid:$rx2_version"
-    compile "io.reactivex.rxjava2:rxjava:$rx2_version"
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

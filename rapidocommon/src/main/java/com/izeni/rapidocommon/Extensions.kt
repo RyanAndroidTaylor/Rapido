@@ -51,8 +51,8 @@ fun runOnIo(block: () -> Unit): Disposable {
             .subscribe({ block() })
 }
 
-fun <T : Transaction<*, *>> Observable<T>.filterNetworkErrors(transactionErrorHandler: TransactionErrorHandler): Observable<T> {
-    return lift(ObservableFilterTransactionError(transactionErrorHandler))
+fun <T, P> Observable<Transaction<T, P>>.filterNetworkErrors(): Observable<Transaction<T, P>> {
+    return lift(ObservableFilterTransactionError())
 }
 
 fun String?.prepend(prepend: String) = if(isNullOrEmpty()) "" else "$prepend$this"

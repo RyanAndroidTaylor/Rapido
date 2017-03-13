@@ -16,8 +16,7 @@ import com.izeni.rapidosqlite.util.DataHelper.toyOneName
 import com.izeni.rapidosqlite.util.DataHelper.toyTwoId
 import com.izeni.rapidosqlite.util.DataHelper.toyTwoName
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,8 +48,58 @@ class DataConnectionTest {
     }
 
     @Test
+    fun testAsyncDoAndClose() {
+        var ran = false
+
+        DataConnection.asyncDoAndClose {
+            ran = true
+
+            val toy = Toy(toyOneId, toyOneName)
+
+            it.save(toy)
+
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val savedToy = it.findFirst(Toy.BUILDER, query)
+
+            assertNotNull(savedToy)
+
+            assertEquals(toyOneId, savedToy?.id)
+            assertEquals(toyOneName, savedToy?.name)
+        }.blockingSubscribe()
+
+        assertTrue(ran)
+    }
+
+    @Test
+    fun testGetAsyncDoAndClose() {
+        var ran = false
+
+        DataConnection.asyncGetAndClose {
+            ran = true
+
+            val toy = Toy(toyOneId, toyOneName)
+
+            it.save(toy)
+
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            it.findFirst(Toy.BUILDER, query)
+        }.blockingSubscribe(
+                {
+                    assertNotNull(it)
+
+                    assertEquals(toyOneId, it?.id)
+                    assertEquals(toyOneName, it?.name)
+                })
+
+        assertTrue(ran)
+    }
+
+    @Test
     fun testFindFirst() {
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
 
             it.save(toy)
@@ -69,6 +118,7 @@ class DataConnectionTest {
     @Test
     fun testFindAll() {
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
 
             it.save(toy)
@@ -109,6 +159,7 @@ class DataConnectionTest {
     @Test
     fun testSaveAll() {
         DataConnection.doAndClose {
+
             val toyOne = Toy(toyOneId, toyOneName)
             val toyTwo = Toy(toyTwoId, toyTwoName)
 
@@ -135,6 +186,7 @@ class DataConnectionTest {
     @Test
     fun testParentChildAndJunctionSave() {
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
             val pet = Pet(petOneId, personOneId, petOneName, listOf(toy))
             val person = Person(personOneId, personOneName, personOneAge, listOf(pet))
@@ -170,6 +222,7 @@ class DataConnectionTest {
     @Test
     fun testUpdateWithId() {
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
 
             it.save(toy)
@@ -184,7 +237,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneId, toyTwoName)
 
-            it.updateWithId(toyTwo)
+            it.updateForColumn(toyTwo, Toy.ID, toyTwo.id)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
@@ -199,7 +252,9 @@ class DataConnectionTest {
 
     @Test
     fun testUpdateWithColumn() {
+
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
 
             it.save(toy)
@@ -214,7 +269,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneId, toyTwoName)
 
-            it.updateWithColumn(toyTwo, Toy.ID, toyOneId)
+            it.updateForColumn(toyTwo, Toy.ID, toyOneId)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
@@ -230,6 +285,7 @@ class DataConnectionTest {
     @Test
     fun testDelete() {
         DataConnection.doAndClose {
+
             val toy = Toy(toyOneId, toyOneName)
 
             it.save(toy)
@@ -251,6 +307,7 @@ class DataConnectionTest {
     @Test
     fun testDeleteAll() {
         DataConnection.doAndClose {
+
             it.saveAll(listOf(Toy(toyOneId, toyOneName), Toy(toyTwoId, toyTwoName)))
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)

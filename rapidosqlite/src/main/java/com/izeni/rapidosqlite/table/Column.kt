@@ -5,7 +5,7 @@ import java.lang.reflect.Type
 /**
  * Created by ryantaylor on 9/22/16.
  */
-class Column(val type: Type, val name: String, val notNull: Boolean = false, val unique: Boolean = false, val foreignKey: Pair<String, Column>? = null) {
+class Column(val type: Type, val name: String, val notNull: Boolean = false, val unique: Boolean = false, val foreignKey: Pair<String, Column>? = null, val defaultValue: Any? = null) {
 
     companion object {
         //TYPE

@@ -1,13 +1,11 @@
 package com.izeni.rapidosqlite.table
 
-import com.izeni.rapidosqlite.table.Column
-import java.util.*
-
+import com.izeni.rapidosqlite.table.Column.Companion.ID
 import com.izeni.rapidosqlite.table.Column.Companion.NOT_NULL
 import com.izeni.rapidosqlite.table.Column.Companion.REFERENCES
 import com.izeni.rapidosqlite.table.Column.Companion.UNIQUE
-import com.izeni.rapidosqlite.table.Column.Companion.ID
 import com.izeni.rapidosqlite.table.Column.Companion.UUID
+import java.util.*
 
 /**
  * Created by ryantaylor on 9/23/16.
@@ -23,6 +21,7 @@ class TableBuilder {
     private val SPACE = " "
     private val PERIOD = ""
     private val COMMA = ","
+    private val DEFAULT = " DEFAULT "
 
     private var createString = StringBuilder()
 
@@ -45,9 +44,10 @@ class TableBuilder {
                 columnBuilder.notNull()
             if (column.unique)
                 columnBuilder.unique()
-            column.foreignKey?.let {
-                columnBuilder.foreignKey(it.first, it.second.name)
-            }
+
+            column.defaultValue?.let { columnBuilder.defaultValue(it) }
+
+            column.foreignKey?.let { columnBuilder.foreignKey(it.first, it.second.name) }
 
             columnBuilder.build()
         }
@@ -163,6 +163,8 @@ class TableBuilder {
 
         private val constraints: MutableList<String>
 
+        private var defaultValue: Any? = null
+
         init {
             constraints = ArrayList<String>()
         }
@@ -216,6 +218,12 @@ class TableBuilder {
             return this
         }
 
+        fun defaultValue(value: Any): ColumnBuilder {
+            defaultValue = value
+
+            return this
+        }
+
         fun build(): String {
             createString.append(COMMA)
             createString.append(columnName)
@@ -225,6 +233,22 @@ class TableBuilder {
             for (constraint in constraints) {
                 createString.append(SPACE)
                 createString.append(constraint)
+            }
+
+            defaultValue?.let {
+                createString.append(DEFAULT)
+
+                when (1) {
+                    1 -> ""
+                    2 -> ""
+                    3 -> ""
+                }
+
+                when (it) {
+                    is String, is Int, is Long -> createString.append(it)
+                    is Boolean -> createString.append(if (it) 1 else 0)
+                    else -> throw IllegalArgumentException("Default value must be of type String, Int, Long or Boolean. Default value type is ${it.javaClass}")
+                }
             }
 
             columns.add(currentTable + PERIOD + columnName)

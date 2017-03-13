@@ -1,6 +1,7 @@
 package com.izeni.rapidocommon
 
 import android.content.Context
+import com.izeni.rapidocommon.errors.TransactionErrorHandler
 import com.izeni.rapidocommon.network.NetworkProvider
 
 /**
@@ -24,5 +25,6 @@ object Rapido {
     fun init(context: Context) {
         SharedPref.setPrefContext(context)
         NetworkProvider.setNetworkContext(context)
+        TransactionErrorHandler.init(context)
     }
 }

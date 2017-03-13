@@ -3,15 +3,30 @@ package com.izeni.rapidocommon.errors
 import com.izeni.rapidocommon.e
 import retrofit2.Response
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Created by ner on 11/21/16.
  */
 object TransactionErrorParser {
     private val errors = HashMap<String, Error>()
+    private val throwableErrors = HashMap<Throwable, Error>()
 
     fun registerError(errorMessage: String, error: Error) {
         errors.put(errorMessage, error)
+    }
+
+    fun registerError(throwable: Throwable, error: Error) {
+        throwableErrors.put(throwable, error)
+    }
+
+    fun parseError(throwable: Throwable?): Error {
+        throwable?.let {
+            if (throwableErrors.containsKey(throwable))
+                return throwableErrors[throwable] ?: ThrowableError(throwable)
+        }
+
+        return ThrowableError(throwable)
     }
 
     fun parseError(errorCode: String?, errorMessage: String?, errorBody: String?): Error {

@@ -1,6 +1,7 @@
 package com.dtp.rapidomvp
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.dtp.rapidomvp.presenter.Presenter
 import com.dtp.rapidomvp.view.ViewLayer
@@ -8,7 +9,7 @@ import com.dtp.rapidomvp.view.ViewLayer
 /**
  * Created by ner on 1/31/17.
  */
-abstract class BaseMvpActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
+abstract class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
 
     protected abstract val view: V
 

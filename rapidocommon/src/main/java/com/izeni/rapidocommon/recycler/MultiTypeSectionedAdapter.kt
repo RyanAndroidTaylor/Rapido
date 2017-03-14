@@ -11,13 +11,12 @@ import com.izeni.rapidocommon.recycler.SectionManager.SectionData
  * Created by ner on 1/2/17.
  */
 //TODO Need to make it so section headers span the recycler view when using a GridLayoutManager
-abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
-                                         private val sectionHeader: SectionedViewHolderData<SectionData>? = null,
-                                         onClick: ((Int, SectionData) -> Unit)? = null) :
+abstract class MultiTypeSectionedAdapter(sections: List<Section<*>>,
+                                         private val sectionHeader: SectionedViewHolderData<SectionData>? = null) :
         RecyclerView.Adapter<SectionedViewHolder<*>>() {
 
     companion object {
-        val HEADER = -112
+        val HEADER = -1
     }
 
     private val sectionManager by lazy { SectionManager(this, sections) }
@@ -25,8 +24,6 @@ abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
     init {
         if (sectionHeader == null && sectionManager.hasHeaders())
             throw IllegalStateException("One of your sections has a header but there was no SectionedViewHolderData passed for section headers")
-
-        sectionHeader?.onClick = onClick
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -77,10 +74,9 @@ abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
     }
 
     class SectionedViewHolderData<T>(@LayoutRes val layoutId: Int, val viewHolder: (View) -> SectionedViewHolder<T>) {
-        var onClick: ((Int, T) -> Unit)? = null
 
         fun createViewHolder(parent: ViewGroup): SectionedViewHolder<T> {
-            return viewHolder(parent.inflate(layoutId)).apply { this.onClick = this@SectionedViewHolderData.onClick }
+            return viewHolder(parent.inflate(layoutId))
         }
     }
 
@@ -88,13 +84,8 @@ abstract class MultiViewSectionedAdapter(sections: List<Section<*>>,
     abstract class Section<T>(val type: Int,
                               private val items: MutableList<T>,
                               val viewHolderData: SectionedViewHolderData<T>,
-                              onClick: ((Int, T) -> Unit)? = null,
                               val hasHeader: Boolean = false,
                               val isCollapsible: Boolean = false) {
-
-        init {
-            viewHolderData.onClick = onClick
-        }
 
         val count: Int
             get() = if (isCollapsed) 0 else items.size

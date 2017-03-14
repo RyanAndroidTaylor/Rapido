@@ -11,9 +11,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.dtp.sample.R
 import com.dtp.sample.TestWhenNull
-import com.izeni.rapidocommon.recycler.MultiViewSectionedAdapter
-import com.izeni.rapidocommon.recycler.MultiViewSectionedAdapter.Section
-import com.izeni.rapidocommon.recycler.MultiViewSectionedAdapter.SectionedViewHolderData
+import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter
+import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter.Section
+import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter.SectionedViewHolderData
 import com.izeni.rapidocommon.recycler.SectionManager.SectionData
 import com.izeni.rapidocommon.recycler.SectionedViewHolder
 import com.izeni.rapidocommon.view.bind

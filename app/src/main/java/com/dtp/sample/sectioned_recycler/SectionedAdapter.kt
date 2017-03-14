@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.dtp.sample.R
-import com.izeni.rapidocommon.recycler.MultiViewSectionedAdapter
+import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter
 import com.izeni.rapidocommon.recycler.SectionManager
 import com.izeni.rapidocommon.recycler.SectionedViewHolder
 import com.izeni.rapidocommon.view.bind
@@ -15,7 +15,7 @@ import com.izeni.rapidocommon.view.onClick
  * Created by ner on 1/31/17.
  */
 class SectionedAdapter(sections: List<Section<*>>, val expandSection: (Boolean, Int) -> Unit) :
-        MultiViewSectionedAdapter(sections, SectionedViewHolderData(R.layout.item_sample_section, { SectionViewHolder(it, expandSection) })) {
+        MultiTypeSectionedAdapter(sections, SectionedViewHolderData(R.layout.item_sample_section, { SectionViewHolder(it, expandSection) })) {
 
     class SectionViewHolder(view: View, val expand: (Boolean, Int) -> Unit) : SectionedViewHolder<SectionManager.SectionData>(view) {
 

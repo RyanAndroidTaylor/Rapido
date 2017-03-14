@@ -6,16 +6,10 @@ import com.dtp.rapidomvp.view.ViewLayer
 /**
  * Created by rtaylor on 9/29/16.
  */
-interface StatePresenter<T: State, V: ViewLayer> : Presenter<V> {
-    /**
-     * This should be a lateinit object that the BasePresenter will setup before it calls any of the load methods
-     */
-    var stateKey: String
+abstract class StatePresenter<T: State, V: ViewLayer> : BasePresenter<V>() {
 
-    fun load(presenterData: PresenterData?)
-    fun saveState(presenterData: PresenterData)
+    abstract val stateKey: String
 
-    override fun destroy() {
-        super.destroy()
-    }
+    abstract fun load(stateManager: stateManager)
+    abstract fun saveState(stateManager: stateManager)
 }

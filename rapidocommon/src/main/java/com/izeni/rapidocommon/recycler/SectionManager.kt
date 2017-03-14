@@ -8,7 +8,7 @@ import com.izeni.rapidocommon.e
 /**
  * Created by ner on 1/11/17.
  */
-class SectionManager(private val adapter: MultiViewSectionedAdapter, private val sections: List<MultiViewSectionedAdapter.Section<*>>) {
+class SectionManager(private val adapter: MultiTypeSectionedAdapter, private val sections: List<MultiTypeSectionedAdapter.Section<*>>) {
 
     private val sectionSpans = SparseArray<SectionSpan>()
     private val headers = SparseIntArray()
@@ -46,7 +46,7 @@ class SectionManager(private val adapter: MultiViewSectionedAdapter, private val
         }
     }
 
-    private fun getSectionForType(sectionType: Int): MultiViewSectionedAdapter.Section<*> {
+    private fun getSectionForType(sectionType: Int): MultiTypeSectionedAdapter.Section<*> {
         return sections.first { it.type == sectionType }
     }
 
@@ -72,7 +72,7 @@ class SectionManager(private val adapter: MultiViewSectionedAdapter, private val
         if (viewHolderType == -1) {
             (0..headers.size() - 1)
                     .filter { position == headers.valueAt(it) }
-                    .forEach { viewHolderType = MultiViewSectionedAdapter.HEADER }
+                    .forEach { viewHolderType = MultiTypeSectionedAdapter.HEADER }
         }
 
         return viewHolderType

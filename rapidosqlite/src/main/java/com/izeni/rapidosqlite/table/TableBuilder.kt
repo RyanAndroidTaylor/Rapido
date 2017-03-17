@@ -1,10 +1,9 @@
 package com.izeni.rapidosqlite.table
 
-import com.izeni.rapidosqlite.table.Column.Companion.ID
+import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.table.Column.Companion.NOT_NULL
 import com.izeni.rapidosqlite.table.Column.Companion.REFERENCES
 import com.izeni.rapidosqlite.table.Column.Companion.UNIQUE
-import com.izeni.rapidosqlite.table.Column.Companion.UUID
 import java.util.*
 
 /**
@@ -32,10 +31,10 @@ class TableBuilder {
     private var columns = ArrayList<String>()
 
     fun buildTable(tableName: String, columns: Array<Column>): String {
-        open(tableName, columns.contains(UUID))
+        open(tableName)
 
         for (column in columns) {
-            if (column.name == UUID.name || column.name == ID.name)
+            if (column.name == ANDROID_ID.name)
                 continue
 
             val columnBuilder = getColumnBuilder(column)
@@ -64,57 +63,16 @@ class TableBuilder {
         }
     }
 
-    private fun open(tableName: String, uuid: Boolean = false): String {
+    private fun open(tableName: String): String {
         prepareNewTable(tableName)
 
         createString.append("CREATE TABLE ")
         createString.append(currentTable)
         createString.append(" ( ")
-        createString.append(ID.name)
+        createString.append(ANDROID_ID.name)
         createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT")
 
-        if (uuid) {
-            createString.append(",")
-            createString.append(UUID.name)
-            createString.append(SPACE)
-            createString.append(TEXT)
-            createString.append(SPACE)
-            createString.append(NOT_NULL)
-            createString.append(SPACE)
-            createString.append(UNIQUE)
-        }
-
-        columns.add(currentTable + PERIOD + ID.name)
-
-        if (uuid)
-            columns.add(currentTable + PERIOD + UUID.name)
-
-        return tableName
-    }
-
-    private fun openWithUuidForeignKeyRestraint(tableName: String, referenceTable: String): String {
-        prepareNewTable(tableName)
-
-        createString.append("CREATE TABLE ")
-        createString.append(currentTable)
-        createString.append(" ( ")
-        createString.append(ID.name)
-        createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
-        createString.append(UUID.name)
-        createString.append(SPACE)
-        createString.append(TEXT)
-        createString.append(SPACE)
-        createString.append(NOT_NULL)
-        createString.append(SPACE)
-        createString.append(UNIQUE)
-        createString.append(" REFERENCES ")
-        createString.append(referenceTable)
-        createString.append("(")
-        createString.append(UUID.name)
-        createString.append(")")
-
-        columns.add(currentTable + PERIOD + ID.name)
-        columns.add(currentTable + PERIOD + UUID.name)
+        columns.add(currentTable + PERIOD + ANDROID_ID.name)
 
         return tableName
     }

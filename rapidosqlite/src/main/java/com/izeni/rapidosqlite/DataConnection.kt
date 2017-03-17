@@ -9,6 +9,7 @@ import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.Query
 import com.izeni.rapidosqlite.query.RawQuery
 import com.izeni.rapidosqlite.table.Column
+import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 import io.reactivex.BackpressureStrategy
@@ -87,13 +88,9 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
         }
 
         fun asyncDoAndClose(block: (DataConnection) -> Unit) {
-            Log.i("DataConnection", "Executed on thread: ${Thread.currentThread().name}")
-
             Observable.just(Unit)
                     .subscribeOn(Schedulers.from(databaseExecutor))
                     .map {
-                        Log.i("DataConnection", "Current Thread is: ${Thread.currentThread().name}")
-
                         val connection = openConnection()
 
                         block(connection)
@@ -164,7 +161,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
      * delete based on the id.
      */
     fun delete(item: DataTable) {
-        database.transaction { it.delete(item.tableName(), "${Column.ID.name}=?", arrayOf(item.id.toString())) }
+        database.transaction { it.delete(item.tableName(), "${ANDROID_ID.name}=?", arrayOf(item.androidId.toString())) }
 
         databaseSubject.onNext(DeleteAction(item.tableName(), item))
     }
@@ -174,6 +171,14 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
      */
     fun deleteAll(items: List<DataTable>) {
         database.transaction { items.forEach { delete(it) } }
+    }
+
+    /**
+     * Clears all data in the database for this table
+     * WARNING!!! Data watchers will not be notified when using this method
+     */
+    fun clear(tableName: String) {
+        database.transaction { it.delete(tableName, null, null) }
     }
 
     fun <T> findFirst(builder: ItemBuilder<T>, query: Query): T? {

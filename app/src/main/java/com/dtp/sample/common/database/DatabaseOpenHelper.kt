@@ -15,6 +15,8 @@ class DatabaseOpenHelper(context: Context) : SQLiteOpenHelper(context, "com.dtp.
 
         db?.execSQL(tableBuilder.buildTable(Person.TABLE_NAME, Person.COLUMNS))
         db?.execSQL(tableBuilder.buildTable(Pet.TABLE_NAME, Pet.COLUMNS))
+        db?.execSQL(tableBuilder.buildTable(Toy.TABLE_NAME, Toy.COLUMNS))
+        db?.execSQL(tableBuilder.buildTable(PetToToy.TABLE_NAME, PetToToy.COLUMNS))
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

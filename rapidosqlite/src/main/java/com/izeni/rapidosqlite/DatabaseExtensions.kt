@@ -29,7 +29,7 @@ fun <T> Cursor.get(column: Column): T {
 fun ContentValues.addAll(columns: Array<Column>, vararg values: Any?): ContentValues {
     for ((index, column) in columns.withIndex()) {
         val value = values[index]
-        if (value != null) {
+        if (value != null && column != Column.ANDROID_ID) {
             when (column.type) {
                 String::class.java -> put(column.name, value as String)
                 Int::class.java -> put(column.name, value as Int)

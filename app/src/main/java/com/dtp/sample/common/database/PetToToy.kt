@@ -9,18 +9,18 @@ import com.izeni.rapidosqlite.table.DataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class PetToToy(val petId: Long, val toyId: Long) : DataTable {
+data class PetToToy(val petUuid: String, val toyUuid: String, override val androidId: Long = -1) : DataTable {
 
     companion object {
         val TABLE_NAME = "PetToToy"
 
-        val PET_ID = Column(LONG, "PetId")
-        val TOY_ID = Column(LONG, "ToyId")
+        val PET_UUID = Column(String::class.java, "PetUuid")
+        val TOY_UUID = Column(String::class.java, "ToyUuid")
 
-        val COLUMNS = arrayOf(PET_ID, TOY_ID)
+        val COLUMNS = arrayOf(PET_UUID, TOY_UUID)
     }
 
     override fun tableName() = TABLE_NAME
 
-    override fun contentValues() = ContentValues().addAll(COLUMNS, petId, toyId)
+    override fun contentValues() = ContentValues().addAll(COLUMNS, petUuid, toyUuid)
 }

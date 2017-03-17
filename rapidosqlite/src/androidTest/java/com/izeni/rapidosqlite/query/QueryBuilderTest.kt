@@ -1,6 +1,7 @@
 package com.izeni.rapidosqlite.query
 
 import android.support.test.runner.AndroidJUnit4
+import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.util.Toy
 import org.junit.After
 import org.junit.Assert.*
@@ -13,6 +14,8 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class QueryBuilderTest {
+
+    val someUUid = "SomeUuid"
 
     @Before
     fun setup() {
@@ -59,7 +62,7 @@ class QueryBuilderTest {
         assertTrue(query is RawQuery)
 
         if (query is RawQuery) {
-            assertEquals(query.query, "SELECT Toy.Id, Toy.Name FROM This is a join string ")
+            assertEquals(query.query, "SELECT ${Toy.TABLE_NAME}.${Toy.UUID.name}, ${Toy.TABLE_NAME}.${Toy.NAME.name}, ${Toy.TABLE_NAME}.${ANDROID_ID.name} FROM This is a join string ")
             assertNull(query.columns)
             assertNull(query.selection)
             assertNull(query.selectionArgs)
@@ -91,16 +94,16 @@ class QueryBuilderTest {
     fun testJoinWithSelectionArgs() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereEquals(Toy.ID, 12345)
+                .whereEquals(Toy.UUID, someUUid)
                 .join("This is a join string")
                 .build()
 
         assertTrue(query is RawQuery)
 
         if (query is RawQuery) {
-            assertEquals(query.query, "SELECT * FROM This is a join string WHERE Id=?")
+            assertEquals(query.query, "SELECT * FROM This is a join string WHERE Uuid=?")
             assertEquals(1, query.selectionArgs?.size)
-            assertEquals("12345", query.selectionArgs!![0])
+            assertEquals(someUUid, query.selectionArgs!![0])
             assertNull(query.columns)
             assertNull(query.selection)
             assertNull(query.limit)
@@ -117,8 +120,8 @@ class QueryBuilderTest {
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
 
-        assertEquals(2, query.columns?.size)
-        assertEquals(Toy.ID.name, query.columns?.get(0))
+        assertEquals(3, query.columns?.size)
+        assertEquals(Toy.UUID.name, query.columns?.get(0))
         assertEquals(Toy.NAME.name, query.columns?.get(1))
 
         assertNull(query.selection)
@@ -131,15 +134,15 @@ class QueryBuilderTest {
     fun testWhereEquals() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereEquals(Toy.ID, 12345)
+                .whereEquals(Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "Id =? ")
+        assertEquals(query.selection, "${Toy.UUID.name} =? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -149,15 +152,15 @@ class QueryBuilderTest {
     fun testWhereEqualsWithTableName() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereEquals(Toy.TABLE_NAME, Toy.ID, 12345)
+                .whereEquals(Toy.TABLE_NAME, Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "${Toy.TABLE_NAME}.Id =? ")
+        assertEquals(query.selection, "${Toy.TABLE_NAME}.${Toy.UUID.name} =? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -167,15 +170,15 @@ class QueryBuilderTest {
     fun testWhereLessThan() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereLessThan(Toy.ID, 12345)
+                .whereLessThan(Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "Id <? ")
+        assertEquals(query.selection, "${Toy.UUID.name} <? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -185,15 +188,15 @@ class QueryBuilderTest {
     fun whereLessThanOrEqualTo() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereLessThanOrEqual(Toy.ID, 12345)
+                .whereLessThanOrEqual(Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "Id <=? ")
+        assertEquals(query.selection, "${Toy.UUID.name} <=? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -203,15 +206,15 @@ class QueryBuilderTest {
     fun testWhereGreaterThan() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereGreaterThan(Toy.ID, 12345)
+                .whereGreaterThan(Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "Id >? ")
+        assertEquals(query.selection, "${Toy.UUID.name} >? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -221,15 +224,15 @@ class QueryBuilderTest {
     fun testWhereGreaterThanOrEqualTo() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereGreaterThanOrEqual(Toy.ID, 12345)
+                .whereGreaterThanOrEqual(Toy.UUID, someUUid)
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "Id >=? ")
+        assertEquals(query.selection, "${Toy.UUID.name} >=? ")
         assertEquals(1, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
 
         assertNull(query.limit)
         assertNull(query.order)
@@ -239,18 +242,18 @@ class QueryBuilderTest {
     fun testOr() {
         val query = QueryBuilder
                 .with(Toy.TABLE_NAME)
-                .whereEquals(Toy.ID, 12345)
+                .whereEquals(Toy.UUID, someUUid)
                 .or()
-                .whereGreaterThan(Toy.NAME, "123")
+                .whereGreaterThan(Toy.NAME, "a")
                 .build()
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
         assertNull(query.columns)
 
-        assertEquals(query.selection, "${Toy.ID.name} =?  OR ${Toy.NAME.name} >? ")
+        assertEquals(query.selection, "${Toy.UUID.name} =?  OR ${Toy.NAME.name} >? ")
         assertEquals(2, query.selectionArgs?.size)
-        assertEquals("12345", query.selectionArgs?.get(0))
-        assertEquals("123", query.selectionArgs?.get(1))
+        assertEquals(someUUid, query.selectionArgs?.get(0))
+        assertEquals("a", query.selectionArgs?.get(1))
 
         assertNull(query.limit)
         assertNull(query.order)

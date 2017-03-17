@@ -5,20 +5,20 @@ package com.izeni.rapidosqlite.util
  */
 object DataHelper {
 
-    val toyOneId = 1235L
+    val toyOneUuid = "toyOneUuid"
     val toyOneName = "Ball"
-    val toyTwoId = 9420L
+    val toyTwoUuid = "toyTwoUuid"
     val toyTwoName = "Slide"
 
-    val petOneId = 10512L
+    val petOneUuid = "petOneUuid"
     val petOneName = "Butch"
-    val petTwoId = 1294L
+    val petTwoUuid = "petTwoUuid"
     val petTwoName = "Clutch"
 
-    val personOneId = 94812L
+    val personOneUuid = "personOneUuid"
     val personOneName = "Jake"
     val personOneAge = 21
-    val personTwoId = 1868L
+    val personTwoUuid = "personTwoUuid"
     val personTwoName = "Rick"
     val personTwoAge = 51
 }

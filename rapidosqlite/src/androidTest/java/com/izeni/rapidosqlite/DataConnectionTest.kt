@@ -5,15 +5,16 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import com.izeni.rapidosqlite.query.Query
+import com.izeni.rapidosqlite.query.QueryBuilder
 import com.izeni.rapidosqlite.util.*
 import com.izeni.rapidosqlite.util.DataHelper.personOneAge
-import com.izeni.rapidosqlite.util.DataHelper.personOneId
+import com.izeni.rapidosqlite.util.DataHelper.personOneUuid
 import com.izeni.rapidosqlite.util.DataHelper.personOneName
-import com.izeni.rapidosqlite.util.DataHelper.petOneId
+import com.izeni.rapidosqlite.util.DataHelper.petOneUuid
 import com.izeni.rapidosqlite.util.DataHelper.petOneName
-import com.izeni.rapidosqlite.util.DataHelper.toyOneId
+import com.izeni.rapidosqlite.util.DataHelper.toyOneUuid
 import com.izeni.rapidosqlite.util.DataHelper.toyOneName
-import com.izeni.rapidosqlite.util.DataHelper.toyTwoId
+import com.izeni.rapidosqlite.util.DataHelper.toyTwoUuid
 import com.izeni.rapidosqlite.util.DataHelper.toyTwoName
 import org.junit.After
 import org.junit.Assert.*
@@ -54,7 +55,7 @@ class DataConnectionTest {
         DataConnection.asyncDoAndClose {
             ran = true
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -64,10 +65,11 @@ class DataConnectionTest {
 
             assertNotNull(savedToy)
 
-            assertEquals(toyOneId, savedToy?.id)
+            assertEquals(toyOneUuid, savedToy?.uuid)
             assertEquals(toyOneName, savedToy?.name)
-        }.blockingSubscribe()
+        }
 
+        Thread.sleep(1000)
         assertTrue(ran)
     }
 
@@ -78,7 +80,7 @@ class DataConnectionTest {
         DataConnection.asyncGetAndClose {
             ran = true
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -89,7 +91,7 @@ class DataConnectionTest {
                 {
                     assertNotNull(it)
 
-                    assertEquals(toyOneId, it?.id)
+                    assertEquals(toyOneUuid, it?.uuid)
                     assertEquals(toyOneName, it?.name)
                 })
 
@@ -100,7 +102,7 @@ class DataConnectionTest {
     fun testFindFirst() {
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -110,7 +112,7 @@ class DataConnectionTest {
 
             assertNotNull(savedToy)
 
-            assertEquals(toyOneId, savedToy?.id)
+            assertEquals(toyOneUuid, savedToy?.uuid)
             assertEquals(toyOneName, savedToy?.name)
         }
     }
@@ -119,7 +121,7 @@ class DataConnectionTest {
     fun testFindAll() {
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -131,11 +133,11 @@ class DataConnectionTest {
             assertEquals(toys.size, 1)
 
             toys[0].let {
-                assertEquals(toyOneId, it.id)
+                assertEquals(toyOneUuid, it.uuid)
                 assertEquals(toyOneName, it.name)
             }
 
-            val toyTwo = Toy(toyTwoId, toyTwoName)
+            val toyTwo = Toy(toyTwoUuid, toyTwoName)
 
             it.insert(toyTwo)
 
@@ -145,12 +147,12 @@ class DataConnectionTest {
             assertEquals(toys.size, 2)
 
             toys[0].let {
-                assertEquals(toyOneId, it.id)
+                assertEquals(toyOneUuid, it.uuid)
                 assertEquals(toyOneName, it.name)
             }
 
             toys[1].let {
-                assertEquals(toyTwoId, it.id)
+                assertEquals(toyTwoUuid, it.uuid)
                 assertEquals(toyTwoName, it.name)
             }
         }
@@ -160,8 +162,8 @@ class DataConnectionTest {
     fun testSaveAll() {
         DataConnection.doAndClose {
 
-            val toyOne = Toy(toyOneId, toyOneName)
-            val toyTwo = Toy(toyTwoId, toyTwoName)
+            val toyOne = Toy(toyOneUuid, toyOneName)
+            val toyTwo = Toy(toyTwoUuid, toyTwoName)
 
             it.insertAll(listOf(toyOne, toyTwo))
 
@@ -172,12 +174,12 @@ class DataConnectionTest {
             assertEquals(2, toys.size)
 
             toys[0].let {
-                assertEquals(toyOneId, it.id)
+                assertEquals(toyOneUuid, it.uuid)
                 assertEquals(toyOneName, it.name)
             }
 
             toys[1].let {
-                assertEquals(toyTwoId, it.id)
+                assertEquals(toyTwoUuid, it.uuid)
                 assertEquals(toyTwoName, it.name)
             }
         }
@@ -187,32 +189,30 @@ class DataConnectionTest {
     fun testParentChildAndJunctionSave() {
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
-            val pet = Pet(petOneId, personOneId, petOneName, listOf(toy))
-            val person = Person(personOneId, personOneName, personOneAge, listOf(pet))
+            val toy = Toy(toyOneUuid, toyOneName)
+            val pet = Pet(petOneUuid, personOneUuid, petOneName, listOf(toy))
+            val person = Person(personOneUuid, personOneName, personOneAge, listOf(pet))
 
             it.insert(person)
 
-            val query = Query(Person.TABLE_NAME, null, null, null, null, null)
-
-            val loadedPerson = it.findFirst(Person.BUILDER, query)
+            val loadedPerson = it.findFirst(Person.BUILDER, QueryBuilder.all(Person.TABLE_NAME))
 
             assertNotNull(loadedPerson)
 
-            assertEquals(personOneId, loadedPerson?.id)
+            assertEquals(personOneUuid, loadedPerson?.uuid)
             assertEquals(personOneName, loadedPerson?.name)
             assertEquals(personOneAge, loadedPerson?.age)
 
             assertEquals(1, loadedPerson?.pets?.size)
 
             loadedPerson?.pets?.get(0)?.let { pet ->
-                assertEquals(personOneId, pet.foreignKey)
-                assertEquals(petOneId, pet.id)
+                assertEquals(personOneUuid, pet.personUuid)
+                assertEquals(petOneUuid, pet.uuid)
                 assertEquals(petOneName, pet.name)
                 assertEquals(1, pet.toys.size)
 
                 pet.toys[0].let { toy ->
-                    assertEquals(toyOneId, toy.id)
+                    assertEquals(toyOneUuid, toy.uuid)
                     assertEquals(toyOneName, toy.name)
                 }
             }
@@ -223,7 +223,7 @@ class DataConnectionTest {
     fun testUpdateWithId() {
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -232,16 +232,16 @@ class DataConnectionTest {
             val savedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(savedToy)
-            assertEquals(toyOneId, savedToy?.id)
+            assertEquals(toyOneUuid, savedToy?.uuid)
             assertEquals(toyOneName, savedToy?.name)
 
-            val toyTwo = Toy(toyOneId, toyTwoName)
+            val toyTwo = Toy(toyOneUuid, toyTwoName)
 
-            it.updateForColumn(toyTwo, Toy.ID, toyTwo.id)
+            it.updateForColumn(toyTwo, Toy.UUID, toyTwo.uuid)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
-            assertEquals(toyOneId, updatedToy?.id)
+            assertEquals(toyOneUuid, updatedToy?.uuid)
             assertEquals(toyTwoName, updatedToy?.name)
 
             val allToys = it.findAll(Toy.BUILDER, query)
@@ -255,7 +255,7 @@ class DataConnectionTest {
 
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -264,16 +264,16 @@ class DataConnectionTest {
             val savedToy = it.findFirst(Toy.BUILDER, query)
 
             assertNotNull(savedToy)
-            assertEquals(toyOneId, savedToy?.id)
+            assertEquals(toyOneUuid, savedToy?.uuid)
             assertEquals(toyOneName, savedToy?.name)
 
-            val toyTwo = Toy(toyOneId, toyTwoName)
+            val toyTwo = Toy(toyOneUuid, toyTwoName)
 
-            it.updateForColumn(toyTwo, Toy.ID, toyOneId)
+            it.updateForColumn(toyTwo, Toy.UUID, toyOneUuid)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
-            assertEquals(toyOneId, updatedToy?.id)
+            assertEquals(toyOneUuid, updatedToy?.uuid)
             assertEquals(toyTwoName, updatedToy?.name)
 
             val allToys = it.findAll(Toy.BUILDER, query)
@@ -286,7 +286,7 @@ class DataConnectionTest {
     fun testDelete() {
         DataConnection.doAndClose {
 
-            val toy = Toy(toyOneId, toyOneName)
+            val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
 
@@ -296,7 +296,7 @@ class DataConnectionTest {
 
             assertNotNull(loadedToy)
 
-            it.delete(Toy.TABLE_NAME, Toy.ID, toyOneId)
+            it.delete(loadedToy!!)
 
             val loadedAfterDeleteToy = it.findFirst(Toy.BUILDER, query)
 
@@ -308,7 +308,9 @@ class DataConnectionTest {
     fun testDeleteAll() {
         DataConnection.doAndClose {
 
-            it.insertAll(listOf(Toy(toyOneId, toyOneName), Toy(toyTwoId, toyTwoName)))
+            val toys = listOf(Toy(toyOneUuid, toyOneName), Toy(toyTwoUuid, toyTwoName))
+
+            it.insertAll(toys)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -316,7 +318,7 @@ class DataConnectionTest {
 
             assertEquals(2, loadedToys.size)
 
-            it.deleteAll(Toy.TABLE_NAME)
+            it.deleteAll(loadedToys)
 
             val loadedAfterDelete = it.findAll(Toy.BUILDER, query)
 
@@ -326,10 +328,10 @@ class DataConnectionTest {
 
     fun clearDatabase() {
         DataConnection.doAndClose {
-            it.deleteAll(PetToToy.TABLE_NAME)
-            it.deleteAll(Toy.TABLE_NAME)
-            it.deleteAll(Pet.TABLE_NAME)
-            it.deleteAll(Person.TABLE_NAME)
+            it.clear(PetToToy.TABLE_NAME)
+            it.clear(Toy.TABLE_NAME)
+            it.clear(Pet.TABLE_NAME)
+            it.clear(Person.TABLE_NAME)
         }
     }
 }

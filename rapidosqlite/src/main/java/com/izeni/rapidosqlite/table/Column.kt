@@ -19,7 +19,6 @@ class Column(val type: Type, val name: String, val notNull: Boolean = false, val
         val REFERENCES = "REFERENCES "
         val UNIQUE = "UNIQUE"
 
-        val ID = Column(LONG, "_id")
-        val UUID = Column(STRING, "uuid")
+        val ANDROID_ID = Column(LONG, "_id")
     }
 }

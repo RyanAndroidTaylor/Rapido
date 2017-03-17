@@ -51,7 +51,6 @@ class SectionedRecyclerActivity : AppCompatActivity() {
                 0,
                 mutableListOf("One", "Two", "Three", "Four", "Five", "Six"),
                 SectionedViewHolderData(R.layout.item_sample_one, { SectionOneViewHolder(it) }),
-                onClick = { type, item -> adapter?.removeItem(type, item) },
                 hasHeader = true,
                 isCollapsible = true) {}
 
@@ -59,7 +58,6 @@ class SectionedRecyclerActivity : AppCompatActivity() {
                 1,
                 mutableListOf(1, 2, 3, 4, 5, 6),
                 SectionedViewHolderData(R.layout.item_sample_two, { SectionTwoViewHolder(it) }),
-                onClick = { type, item -> adapter?.removeItem(type, item) },
                 hasHeader = true,
                 isCollapsible = true) {}
 
@@ -67,7 +65,6 @@ class SectionedRecyclerActivity : AppCompatActivity() {
                 2,
                 mutableListOf("One" to "1", "Two" to "2", "Three" to "3", "Four" to "4", "Five" to "5", "Six" to "6"),
                 SectionedViewHolderData(R.layout.item_sample_three, { SectionThreeViewHolder(it) }),
-                onClick = { type, item -> adapter?.removeItem(type, item) },
                 hasHeader = true,
                 isCollapsible = true) {}
 

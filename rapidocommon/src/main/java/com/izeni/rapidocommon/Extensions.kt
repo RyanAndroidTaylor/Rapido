@@ -2,9 +2,9 @@
 
 package com.izeni.rapidocommon
 
-import com.izeni.rapidocommon.errors.TransactionErrorHandler
-import com.izeni.rapidocommon.errors.ObservableFilterTransactionError
-import com.izeni.rapidocommon.errors.Transaction
+import com.izeni.rapidocommon.transaction.TransactionErrorHandler
+import com.izeni.rapidocommon.transaction.ObservableFilterTransactionError
+import com.izeni.rapidocommon.transaction.Transaction
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers

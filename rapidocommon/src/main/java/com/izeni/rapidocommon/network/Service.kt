@@ -1,7 +1,7 @@
 package com.izeni.rapidocommon.network
 
-import com.izeni.rapidocommon.errors.TransactionErrorParser
-import com.izeni.rapidocommon.errors.Transaction
+import com.izeni.rapidocommon.transaction.TransactionErrorParser
+import com.izeni.rapidocommon.transaction.Transaction
 import io.reactivex.subjects.BehaviorSubject
 import retrofit2.Response
 

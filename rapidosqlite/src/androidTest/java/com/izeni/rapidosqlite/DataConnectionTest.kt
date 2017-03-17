@@ -56,7 +56,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -80,7 +80,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -102,7 +102,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -121,7 +121,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -137,7 +137,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyTwoId, toyTwoName)
 
-            it.save(toyTwo)
+            it.insert(toyTwo)
 
             toys = it.findAll(Toy.BUILDER, query)
 
@@ -163,7 +163,7 @@ class DataConnectionTest {
             val toyOne = Toy(toyOneId, toyOneName)
             val toyTwo = Toy(toyTwoId, toyTwoName)
 
-            it.saveAll(listOf(toyOne, toyTwo))
+            it.insertAll(listOf(toyOne, toyTwo))
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -191,7 +191,7 @@ class DataConnectionTest {
             val pet = Pet(petOneId, personOneId, petOneName, listOf(toy))
             val person = Person(personOneId, personOneName, personOneAge, listOf(pet))
 
-            it.save(person)
+            it.insert(person)
 
             val query = Query(Person.TABLE_NAME, null, null, null, null, null)
 
@@ -225,7 +225,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -257,7 +257,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -288,7 +288,7 @@ class DataConnectionTest {
 
             val toy = Toy(toyOneId, toyOneName)
 
-            it.save(toy)
+            it.insert(toy)
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
@@ -308,7 +308,7 @@ class DataConnectionTest {
     fun testDeleteAll() {
         DataConnection.doAndClose {
 
-            it.saveAll(listOf(Toy(toyOneId, toyOneName), Toy(toyTwoId, toyTwoName)))
+            it.insertAll(listOf(Toy(toyOneId, toyOneName), Toy(toyTwoId, toyTwoName)))
 
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 

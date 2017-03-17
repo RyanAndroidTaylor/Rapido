@@ -1,4 +1,4 @@
-package com.izeni.rapidocommon.errors
+package com.izeni.rapidocommon.transaction
 
 import io.reactivex.ObservableOperator
 import io.reactivex.Observer

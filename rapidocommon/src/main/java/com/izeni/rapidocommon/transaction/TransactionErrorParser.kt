@@ -1,4 +1,4 @@
-package com.izeni.rapidocommon.errors
+package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.e
 import retrofit2.Response

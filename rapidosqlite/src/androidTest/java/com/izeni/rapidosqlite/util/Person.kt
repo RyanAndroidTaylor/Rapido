@@ -9,6 +9,7 @@ import com.izeni.rapidosqlite.get
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.QueryBuilder
 import com.izeni.rapidosqlite.table.Column
+import com.izeni.rapidosqlite.table.Column.Companion.ID
 import com.izeni.rapidosqlite.table.Column.Companion.INT
 import com.izeni.rapidosqlite.table.Column.Companion.LONG
 import com.izeni.rapidosqlite.table.Column.Companion.STRING
@@ -18,11 +19,10 @@ import com.izeni.rapidosqlite.table.ParentDataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class Person(val id: Long, val name: String, val age: Int, val pets: List<Pet>) : ParentDataTable {
+data class Person(override val id: Long = -1, val name: String, val age: Int, val pets: List<Pet>) : ParentDataTable {
     companion object {
         val TABLE_NAME = "Person"
 
-        val ID = Column(LONG, "Id", notNull = true, unique = true)
         val NAME = Column(STRING, "Name", notNull = true)
         val AGE = Column(INT, "Age", notNull = true)
 

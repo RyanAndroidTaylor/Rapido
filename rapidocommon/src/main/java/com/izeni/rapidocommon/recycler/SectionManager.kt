@@ -204,7 +204,7 @@ class SectionManager(private val adapter: MultiTypeSectionedAdapter, private val
         val count: Int
             get() = end - start + 1
 
-        fun contains(position: Int): Boolean = position >= start && position <= end
+        fun contains(position: Int): Boolean = position in start..end
 
         fun isBefore(position: Int): Boolean = end < position
 

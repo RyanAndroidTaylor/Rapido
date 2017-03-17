@@ -1,4 +1,4 @@
-package com.izeni.rapidocommon.errors
+package com.izeni.rapidocommon.transaction
 
 /**
  * Created by ner on 11/20/16.

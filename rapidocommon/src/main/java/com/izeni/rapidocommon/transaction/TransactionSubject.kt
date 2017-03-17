@@ -1,4 +1,4 @@
-package com.izeni.rapidocommon.errors
+package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.filterNetworkErrors
 import io.reactivex.Observable
@@ -11,11 +11,11 @@ import io.reactivex.subjects.BehaviorSubject
 class TransactionSubject<T, P> {
     private val subject: BehaviorSubject<Transaction<T, P>> = BehaviorSubject.create()
 
-    fun onIdel() {
+    fun onIdle() {
         subject.onNext(Transaction.Idle<T, P>())
     }
 
-    fun onLoading(progress: P?) {
+    fun onLoading(progress: P? = null) {
         subject.onNext(Transaction.Loading(progress))
     }
 

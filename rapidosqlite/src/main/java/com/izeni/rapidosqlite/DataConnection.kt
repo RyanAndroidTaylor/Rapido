@@ -52,9 +52,10 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
                     .toFlowable(BackpressureStrategy.BUFFER)
         }
 
-        fun watchTableDelets(tableName: String): Flowable<DeleteAction> {
-            return databaseSubject.filter { it is DeleteAction && it.tableName == tableName }
-                    .map { it as DeleteAction }
+        @Suppress("UNCHECKED_CAST")
+        fun <T : DataTable> watchTableDeletes(tableName: String): Flowable<DeleteAction<T>> {
+            return databaseSubject.filter { it is DeleteAction<*> && it.tableName == tableName }
+                    .map { it as DeleteAction<T> }
                     .toFlowable(BackpressureStrategy.BUFFER)
         }
 
@@ -85,10 +86,10 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
             return items
         }
 
-        fun asyncDoAndClose(block: (DataConnection) -> Unit): Observable<Unit> {
+        fun asyncDoAndClose(block: (DataConnection) -> Unit) {
             Log.i("DataConnection", "Executed on thread: ${Thread.currentThread().name}")
 
-            return Observable.just(Unit)
+            Observable.just(Unit)
                     .subscribeOn(Schedulers.from(databaseExecutor))
                     .map {
                         Log.i("DataConnection", "Current Thread is: ${Thread.currentThread().name}")
@@ -98,7 +99,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
                         block(connection)
 
                         connection.close()
-                    }
+                    }.subscribe({}, {})
         }
 
         fun doAndClose(block: (DataConnection) -> Unit) {
@@ -123,17 +124,17 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
             database.close()
     }
 
-    fun save(item: DataTable) {
-        database.transaction { save(item, it) }
+    fun insert(item: DataTable) {
+        database.transaction { insert(item, it) }
     }
 
-    fun saveAll(items: List<DataTable>) {
-        database.transaction { database -> items.forEach { save(it, database) } }
+    fun insertAll(items: List<DataTable>) {
+        database.transaction { database -> items.forEach { insert(it, database) } }
     }
 
-    private fun save(item: DataTable, database: SQLiteDatabase) {
+    private fun insert(item: DataTable, database: SQLiteDatabase) {
         if (item is ParentDataTable) {
-            item.getChildren()?.forEach { save(it, database) }
+            item.getChildren().forEach { insert(it, database) }
         }
 
         database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
@@ -162,24 +163,17 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
      * If column is not null delete based on the column and value. If column is null
      * delete based on the id.
      */
-    fun delete(tableName: String, column: Column, value: Any) {
-        val columnValue = when (value) {
-            is String -> value
-            is Int, is Long -> value.toString()
-            is Boolean -> if (value) "1" else "0"
-            else -> throw IllegalArgumentException("String, Int, Long and Boolean are the only supported types. You passed ${value.javaClass}")
-        }
+    fun delete(item: DataTable) {
+        database.transaction { it.delete(item.tableName(), "${Column.ID.name}=?", arrayOf(item.id.toString())) }
 
-        database.transaction { it.delete(tableName, "${column.name}=?", arrayOf(columnValue)) }
-
-        databaseSubject.onNext(DeleteAction(tableName, column, value))
+        databaseSubject.onNext(DeleteAction(item.tableName(), item))
     }
 
     /**
      * Delete everything for the table name that matches the column and value
      */
-    fun deleteAll(tableName: String) {
-        database.transaction { it.delete(tableName, null, null) }
+    fun deleteAll(items: List<DataTable>) {
+        database.transaction { items.forEach { delete(it) } }
     }
 
     fun <T> findFirst(builder: ItemBuilder<T>, query: Query): T? {
@@ -229,5 +223,5 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
 
     class UpdateAction<out T : DataTable>(tableName: String, val item: T) : DataAction<T>(tableName)
 
-    class DeleteAction(tableName: String, val column: Column, val value: Any) : DataAction<Unit>(tableName)
+    class DeleteAction<out T : DataTable>(tableName: String, val item: T) : DataAction<T>(tableName)
 }

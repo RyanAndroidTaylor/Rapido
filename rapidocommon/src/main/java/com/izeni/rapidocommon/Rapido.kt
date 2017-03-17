@@ -1,7 +1,7 @@
 package com.izeni.rapidocommon
 
 import android.content.Context
-import com.izeni.rapidocommon.errors.TransactionErrorHandler
+import com.izeni.rapidocommon.transaction.TransactionErrorHandler
 import com.izeni.rapidocommon.network.NetworkProvider
 
 /**

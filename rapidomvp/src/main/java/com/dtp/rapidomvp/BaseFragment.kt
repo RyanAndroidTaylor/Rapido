@@ -18,15 +18,28 @@ abstract class BaseFragment<V: ViewLayer, P: Presenter<V>> : Fragment() {
 
     lateinit var presenter: P
 
+    private var isSubscribed = false
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val content = inflater?.inflate(fragmentView, container, false)
+
+        createPresenter()
+
         return content
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        subscribe()
+    }
+
+    abstract fun createPresenter(): P
 
     override fun onPause() {
         super.onPause()
 
-        presenter.unSubscribe()
+        unSubscribe()
     }
 
     override fun onDestroy() {
@@ -38,6 +51,20 @@ abstract class BaseFragment<V: ViewLayer, P: Presenter<V>> : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        presenter.subscribe(view)
+        subscribe()
+    }
+
+    private fun subscribe() {
+        if (!isSubscribed) {
+            presenter.subscribe(view)
+            isSubscribed = true
+        }
+    }
+
+    private fun unSubscribe() {
+        if (isSubscribed) {
+            presenter.unSubscribe()
+            isSubscribed = false
+        }
     }
 }

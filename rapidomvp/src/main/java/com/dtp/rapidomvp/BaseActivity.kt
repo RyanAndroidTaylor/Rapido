@@ -11,30 +11,50 @@ import com.dtp.rapidomvp.view.ViewLayer
  */
 abstract class BaseActivity<V: ViewLayer, P: Presenter<V>> : AppCompatActivity() {
 
+    protected abstract val layoutID: Int
     protected abstract val view: V
 
     lateinit var presenter: P
 
+    private var isSubscribed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(layoutID)
 
         presenter = createPresenter()
+
+        subscribe()
     }
 
     override fun onResume() {
         super.onResume()
 
-        presenter.subscribe(view)
+        subscribe()
     }
 
     override fun onPause() {
         super.onPause()
 
-        presenter.unSubscribe()
+        unSubscribe()
 
         if (isFinishing)
             presenter.destroy()
     }
 
     abstract fun createPresenter(): P
+
+    private fun subscribe() {
+        if (!isSubscribed) {
+            presenter.subscribe(view)
+            isSubscribed = true
+        }
+    }
+
+    private fun unSubscribe() {
+        if (isSubscribed) {
+            presenter.unSubscribe()
+            isSubscribed = false
+        }
+    }
 }

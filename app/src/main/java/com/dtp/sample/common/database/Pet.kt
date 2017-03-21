@@ -17,7 +17,7 @@ import com.izeni.rapidosqlite.table.ParentDataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>, override val androidId: Long = -1) : ParentDataTable {
+data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>, override var androidId: Long = -1) : ParentDataTable {
 
     companion object {
         val TABLE_NAME = "Pet"
@@ -61,6 +61,7 @@ data class Pet(val uuid: String, val personUuid: String, val name: String, val t
                     .whereEquals(TABLE_NAME, UUID, uuid)
                     .join(manyToMany)
                     .build()
+
             val toys = dataConnection.findAll(Toy.BUILDER, query)
 
             return Pet(uuid, cursor.get(PERSON_UUID), cursor.get(NAME), toys, cursor.get(ANDROID_ID))

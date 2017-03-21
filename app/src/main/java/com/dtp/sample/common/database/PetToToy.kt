@@ -9,7 +9,7 @@ import com.izeni.rapidosqlite.table.DataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class PetToToy(val petUuid: String, val toyUuid: String, override val androidId: Long = -1) : DataTable {
+data class PetToToy(val petUuid: String, val toyUuid: String, override var androidId: Long = -1) : DataTable {
 
     companion object {
         val TABLE_NAME = "PetToToy"

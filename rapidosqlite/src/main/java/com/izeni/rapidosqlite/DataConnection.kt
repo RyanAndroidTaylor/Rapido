@@ -15,6 +15,7 @@ import com.izeni.rapidosqlite.table.ParentDataTable
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.util.*
@@ -60,10 +61,10 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
                     .toFlowable(BackpressureStrategy.BUFFER)
         }
 
-        fun <T> asyncGetAndClose(block: (DataConnection) -> T): Observable<T> {
+        fun <T> asyncGetAndClose(block: (DataConnection) -> T): Single<T> {
             Log.i("DataConnection", "Called on thread: ${Thread.currentThread().name}")
 
-            return Observable.just(Unit)
+            return Single.just(Unit)
                     .subscribeOn(Schedulers.from(databaseExecutor))
                     .map {
                         Log.i("DataConnection", "Executed on thread: ${Thread.currentThread().name}")
@@ -88,7 +89,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
         }
 
         fun asyncDoAndClose(block: (DataConnection) -> Unit) {
-            Observable.just(Unit)
+            Single.just(Unit)
                     .subscribeOn(Schedulers.from(databaseExecutor))
                     .map {
                         val connection = openConnection()
@@ -134,7 +135,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
             item.getChildren().forEach { insert(it, database) }
         }
 
-        database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
+        item.androidId = database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
 
         databaseSubject.onNext(SaveAction(item.tableName(), item))
     }
@@ -157,20 +158,23 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
     }
 
     /**
-     * If column is not null delete based on the column and value. If column is null
-     * delete based on the id.
+     * Delete all items from the database
      */
-    fun delete(item: DataTable) {
-        database.transaction { it.delete(item.tableName(), "${ANDROID_ID.name}=?", arrayOf(item.androidId.toString())) }
-
-        databaseSubject.onNext(DeleteAction(item.tableName(), item))
+    fun deleteAll(items: List<DataTable>) {
+        database.transaction { database -> items.forEach { delete(it, database) } }
     }
 
     /**
-     * Delete everything for the table name that matches the column and value
+     * Deletes the item fro the database
      */
-    fun deleteAll(items: List<DataTable>) {
-        database.transaction { items.forEach { delete(it) } }
+    fun delete(item: DataTable) {
+        database.transaction { delete(item, it) }
+    }
+
+    private fun delete(item: DataTable, database: SQLiteDatabase) {
+        database.delete(item.tableName(), "${ANDROID_ID.name}=?", arrayOf(item.androidId.toString()))
+
+        databaseSubject.onNext(DeleteAction(item.tableName(), item))
     }
 
     /**
@@ -182,32 +186,33 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
     }
 
     fun <T> findFirst(builder: ItemBuilder<T>, query: Query): T? {
+        var cursor: Cursor? = null
         var item: T? = null
 
         database.transaction {
-            val cursor = getCursor(database, query)
-
-            if (cursor.moveToFirst())
-                item = builder.buildItem(cursor, this)
-
-            cursor.close()
+            cursor = getCursor(database, query).also {
+                if (it.moveToFirst())
+                    item = builder.buildItem(it, this)
+            }
         }
+
+        cursor?.close()
 
         return item
     }
 
     fun <T> findAll(builder: ItemBuilder<T>, query: Query): List<T> {
+        var cursor: Cursor? = null
         val items = ArrayList<T>()
 
         database.transaction {
-            val cursor = getCursor(database, query)
-
-            while (cursor.moveToNext()) {
-                items.add(builder.buildItem(cursor, this))
+            cursor = getCursor(database, query).also {
+                while (it.moveToNext())
+                    items.add(builder.buildItem(it, this))
             }
-
-            cursor.close()
         }
+
+        cursor?.close()
 
         return items
     }
@@ -218,7 +223,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
         if (query is RawQuery) {
             return database.rawQuery(query.query, query.selectionArgs)
         } else {
-            return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, null, null, query.order, query.limit)
+            return database.query(query.tableName, query.columns, query.selection, query.selectionArgs, query.groupBy, null, query.order, query.limit)
         }
     }
 

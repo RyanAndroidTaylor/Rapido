@@ -10,7 +10,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.dtp.sample.R
-import com.dtp.sample.TestWhenNull
 import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter
 import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter.Section
 import com.izeni.rapidocommon.recycler.MultiTypeSectionedAdapter.SectionedViewHolderData
@@ -35,8 +34,6 @@ class SectionedRecyclerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_multi_view_holder_sample)
-
-        TestWhenNull().test()
 
         add_item.onClick {
             val type = random.nextInt(3)

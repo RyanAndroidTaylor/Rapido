@@ -77,7 +77,7 @@ class DataConnectionTest {
     fun testGetAsyncDoAndClose() {
         var ran = false
 
-        DataConnection.asyncGetAndClose {
+        val toy = DataConnection.asyncGetAndClose {
             ran = true
 
             val toy = Toy(toyOneUuid, toyOneName)
@@ -87,13 +87,12 @@ class DataConnectionTest {
             val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
 
             it.findFirst(Toy.BUILDER, query)
-        }.blockingSubscribe(
-                {
-                    assertNotNull(it)
+        }.blockingGet()
 
-                    assertEquals(toyOneUuid, it?.uuid)
-                    assertEquals(toyOneName, it?.name)
-                })
+        assertNotNull(toy)
+
+        assertEquals(toyOneUuid, toy?.uuid)
+        assertEquals(toyOneName, toy?.name)
 
         assertTrue(ran)
     }

@@ -27,6 +27,7 @@ class QueryBuilder private constructor() {
     private var order: String? = null
     private var limit: String? = null
     private var join: String? = null
+    private var groupBy: String? = null
 
     companion object {
         fun with(tableName: String): QueryBuilder {
@@ -168,6 +169,12 @@ class QueryBuilder private constructor() {
         return this
     }
 
+    fun groupBy(column: Column): QueryBuilder {
+        groupBy = column.name
+
+        return this
+    }
+
     fun build(): Query {
         insureValidQuery()
 
@@ -187,7 +194,7 @@ class QueryBuilder private constructor() {
 
         val selection = getSelectionString()
 
-        return Query(tableName, columns, selection, args, order, limit)
+        return Query(tableName, columns, selection, args, groupBy, order, limit)
     }
 
     private fun buildRawQuery(): RawQuery {

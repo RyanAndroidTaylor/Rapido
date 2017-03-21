@@ -52,7 +52,7 @@ inline fun SQLiteDatabase.transaction(block: (SQLiteDatabase) -> Unit): Boolean 
 
         return true
     } catch (e: Exception) {
-        Log.e("DatabaseExtension", e.message)
+        e.printStackTrace()
     } finally {
         endTransaction()
     }

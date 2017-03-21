@@ -13,7 +13,7 @@ import com.izeni.rapidosqlite.table.DataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class Toy(val uuid: String, val name: String, override val androidId: Long = -1) : DataTable {
+data class Toy(val uuid: String, val name: String, override var androidId: Long = -1) : DataTable {
 
     companion object {
         val TABLE_NAME = "Toy"

@@ -16,7 +16,7 @@ import com.izeni.rapidosqlite.table.ParentDataTable
 /**
  * Created by ner on 2/8/17.
  */
-data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>, override val androidId: Long = -1) : ParentDataTable {
+data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>, override var androidId: Long = -1) : ParentDataTable {
 
     companion object {
         val TABLE_NAME = "Pet"

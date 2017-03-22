@@ -17,6 +17,8 @@ fun <T> Cursor.get(column: Column): T {
         String::class.java -> return getString(getColumnIndex(column.name)) as T
         Int::class.java -> return getInt(getColumnIndex(column.name)) as T
         Long::class.java -> return getLong(getColumnIndex(column.name)) as T
+        Float::class.java -> return getFloat(getColumnIndex(column.name)) as T
+        Double::class.java -> return getDouble(getColumnIndex(column.name)) as T
         Boolean::class.java -> return (getInt(getColumnIndex(column.name)) == 1) as T
         else -> throw UnsupportedOperationException("${column.type} is not a supported type")
     }
@@ -29,11 +31,13 @@ fun <T> Cursor.get(column: Column): T {
 fun ContentValues.addAll(columns: Array<Column>, vararg values: Any?): ContentValues {
     for ((index, column) in columns.withIndex()) {
         val value = values[index]
-        if (value != null && column != Column.ANDROID_ID) {
+        if (value != null) {
             when (column.type) {
                 String::class.java -> put(column.name, value as String)
                 Int::class.java -> put(column.name, value as Int)
                 Long::class.java -> put(column.name, value as Long)
+                Float::class.java -> put(column.name, value as Float)
+                Double::class.java -> put(column.name, value as Double)
                 Boolean::class.java -> put(column.name, if ((value as Boolean)) 1 else 0)
                 else -> throw IllegalArgumentException("${column.type} not supported by this method")
             }

@@ -9,14 +9,13 @@ import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.ManyToMany
 import com.izeni.rapidosqlite.query.QueryBuilder
 import com.izeni.rapidosqlite.table.Column
-import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 
 /**
  * Created by ner on 2/8/17.
  */
-data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>, override var androidId: Long = -1) : ParentDataTable {
+data class Pet(val uuid: String, val personUuid: String, val name: String, val toys: List<Toy>) : ParentDataTable {
 
     companion object {
         val TABLE_NAME = "Pet"
@@ -25,14 +24,18 @@ data class Pet(val uuid: String, val personUuid: String, val name: String, val t
         val PERSON_UUID = Column(String::class.java, "PersonUuid", notNull = true)
         val NAME = Column(String::class.java, "Name", notNull = true)
 
-        val COLUMNS = arrayOf(UUID, PERSON_UUID, NAME, ANDROID_ID)
+        val COLUMNS = arrayOf(UUID, PERSON_UUID, NAME)
 
         val BUILDER = Builder()
     }
 
     override fun tableName() = TABLE_NAME
 
-    override fun contentValues() = ContentValues().addAll(COLUMNS, uuid, personUuid, name, androidId)
+    override fun id() = uuid
+
+    override fun idColumn() = UUID
+
+    override fun contentValues() = ContentValues().addAll(COLUMNS, uuid, personUuid, name)
 
     override fun getChildren(): List<DataTable> {
         val children = mutableListOf<DataTable>()
@@ -63,7 +66,7 @@ data class Pet(val uuid: String, val personUuid: String, val name: String, val t
 
             val toys = dataConnection.findAll(Toy.BUILDER, query)
 
-            return Pet(uuid, cursor.get(PERSON_UUID), cursor.get(NAME), toys, cursor.get(ANDROID_ID))
+            return Pet(uuid, cursor.get(PERSON_UUID), cursor.get(NAME), toys)
         }
     }
 }

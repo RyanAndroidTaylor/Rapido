@@ -1,7 +1,6 @@
 package com.izeni.rapidosqlite.query
 
 import android.support.test.runner.AndroidJUnit4
-import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.util.Toy
 import org.junit.After
 import org.junit.Assert.*
@@ -62,7 +61,7 @@ class QueryBuilderTest {
         assertTrue(query is RawQuery)
 
         if (query is RawQuery) {
-            assertEquals(query.query, "SELECT ${Toy.TABLE_NAME}.${Toy.UUID.name}, ${Toy.TABLE_NAME}.${Toy.NAME.name}, ${Toy.TABLE_NAME}.${ANDROID_ID.name} FROM This is a join string ")
+            assertEquals(query.query, "SELECT ${Toy.TABLE_NAME}.${Toy.UUID.name}, ${Toy.TABLE_NAME}.${Toy.NAME.name} FROM This is a join string ")
             assertNull(query.columns)
             assertNull(query.selection)
             assertNull(query.selectionArgs)

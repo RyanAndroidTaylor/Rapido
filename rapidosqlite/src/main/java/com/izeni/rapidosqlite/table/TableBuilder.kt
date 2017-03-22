@@ -1,6 +1,5 @@
 package com.izeni.rapidosqlite.table
 
-import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.table.Column.Companion.NOT_NULL
 import com.izeni.rapidosqlite.table.Column.Companion.REFERENCES
 import com.izeni.rapidosqlite.table.Column.Companion.UNIQUE
@@ -21,6 +20,7 @@ class TableBuilder {
     private val PERIOD = ""
     private val COMMA = ","
     private val DEFAULT = " DEFAULT "
+    private val ANDROID_ID = "_id"
 
     private var createString = StringBuilder()
 
@@ -34,9 +34,6 @@ class TableBuilder {
         open(tableName)
 
         for (column in columns) {
-            if (column.name == ANDROID_ID.name)
-                continue
-
             val columnBuilder = getColumnBuilder(column)
 
             if (column.notNull)
@@ -69,10 +66,10 @@ class TableBuilder {
         createString.append("CREATE TABLE ")
         createString.append(currentTable)
         createString.append(" ( ")
-        createString.append(ANDROID_ID.name)
+        createString.append(ANDROID_ID)
         createString.append(" INTEGER PRIMARY KEY AUTOINCREMENT")
 
-        columns.add(currentTable + PERIOD + ANDROID_ID.name)
+        columns.add("$currentTable$PERIOD$ANDROID_ID")
 
         return tableName
     }

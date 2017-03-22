@@ -9,12 +9,10 @@ import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.Query
 import com.izeni.rapidosqlite.query.RawQuery
 import com.izeni.rapidosqlite.table.Column
-import com.izeni.rapidosqlite.table.Column.Companion.ANDROID_ID
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -135,9 +133,13 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
             item.getChildren().forEach { insert(it, database) }
         }
 
-        item.androidId = database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
+        database.insertWithOnConflict(item.tableName(), null, item.contentValues(), conflictAlgorithm)
 
         databaseSubject.onNext(SaveAction(item.tableName(), item))
+    }
+
+    fun update(item: DataTable) {
+        database.transaction { it.update(item.tableName(), item.contentValues(), "${item.idColumn().name}=?", arrayOf(item.id())) }
     }
 
     /**
@@ -172,7 +174,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
     }
 
     private fun delete(item: DataTable, database: SQLiteDatabase) {
-        database.delete(item.tableName(), "${ANDROID_ID.name}=?", arrayOf(item.androidId.toString()))
+        database.delete(item.tableName(), "${item.idColumn().name}=?", arrayOf(item.id()))
 
         databaseSubject.onNext(DeleteAction(item.tableName(), item))
     }

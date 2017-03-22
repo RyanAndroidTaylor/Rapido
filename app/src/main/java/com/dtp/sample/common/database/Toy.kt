@@ -17,7 +17,7 @@ data class Toy(val uuid: String, val name: String) : DataTable {
     companion object {
         val TABLE_NAME = "Toy"
 
-        val UUID = Column(String::class.java, "Uuid")
+        val UUID = Column(String::class.java, "Uuid", notNull = true, unique = true)
         val NAME = Column(String::class.java, "Name")
 
         val COLUMNS = arrayOf(UUID, NAME)

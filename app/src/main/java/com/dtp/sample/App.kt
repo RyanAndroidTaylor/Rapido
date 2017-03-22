@@ -2,8 +2,7 @@ package com.dtp.sample
 
 import android.app.Application
 import com.dtp.sample.common.database.DatabaseOpenHelper
-import com.izeni.rapidosqlite.DataConnection
-import com.idescout.sql.SqlScoutServer
+import com.facebook.stetho.Stetho
 
 /**
  * Created by ryantaylor on 9/22/16.
@@ -21,6 +20,6 @@ class App : Application() {
 
         com.izeni.rapidosqlite.DataConnection.init(DatabaseOpenHelper(this))
 
-        SqlScoutServer.create(this, packageName)
+        Stetho.initializeWithDefaults(this)
     }
 }

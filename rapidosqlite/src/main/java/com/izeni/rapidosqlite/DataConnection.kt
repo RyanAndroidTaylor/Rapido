@@ -2,7 +2,9 @@ package com.izeni.rapidosqlite
 
 import android.annotation.SuppressLint
 import android.database.Cursor
+import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
@@ -138,25 +140,42 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
         databaseSubject.onNext(SaveAction(item.tableName(), item))
     }
 
-    fun update(item: DataTable) {
-        database.transaction { it.update(item.tableName(), item.contentValues(), "${item.idColumn().name}=?", arrayOf(item.id())) }
+    fun upsert(item: DataTable) {
+        database.transaction { upsert(item, it) }
     }
 
-    /**
-     * If column is not null update based on the column and value. If column is null
-     * update based on the id.
-     */
-    fun updateForColumn(item: DataTable, column: Column, value: Any) {
-        val columnValue = when (value) {
-            is String -> value
-            is Int, is Long, is Float, is Double -> value.toString()
-            is Boolean -> if (value) "1" else "0"
-            else -> throw IllegalArgumentException("String, Int, Long and Boolean are the only supported types. You passed ${value.javaClass}")
+    fun upsertAll(items: List<DataTable>) {
+        database.transaction { database -> items.forEach { upsert(it, database) } }
+    }
+
+    private fun upsert(item: DataTable, database: SQLiteDatabase) {
+        if (item is ParentDataTable) {
+            item.getChildren().forEach { upsert(it, database) }
         }
 
-        database.transaction { it.update(item.tableName(), item.contentValues(), "${column.name}=?", arrayOf(columnValue)) }
+        try {
+            database.insertOrThrow(item.tableName(), null, item.contentValues())
+        } catch (exception: SQLiteException) {
+            if (exception is SQLiteConstraintException) {
+                val rowsUpdated = database.update(item.tableName(), item.contentValues(), "${item.idColumn().name}=?", arrayOf(item.id()))
 
-        databaseSubject.onNext(UpdateAction(item.tableName(), item))
+                if (rowsUpdated < 1)
+                    throw exception
+            } else {
+                throw exception
+            }
+        }
+
+        databaseSubject.onNext(SaveAction(item.tableName(), item))
+    }
+
+    fun update(item: DataTable) {
+        database.transaction {
+            val rowsUpdated = it.update(item.tableName(), item.contentValues(), "${item.idColumn().name}=?", arrayOf(item.id()))
+
+            if (rowsUpdated < 1)
+                Log.d("DataConnection", "Failed to update any rows while updating item: \n$item")
+        }
     }
 
     /**

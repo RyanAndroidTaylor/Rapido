@@ -1,6 +1,7 @@
 package com.izeni.rapidosqlite
 
 import android.content.Context
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -158,7 +159,7 @@ class DataConnectionTest {
     }
 
     @Test
-    fun testSaveAll() {
+    fun testInsertAll() {
         DataConnection.doAndClose {
 
             val toyOne = Toy(toyOneUuid, toyOneName)
@@ -219,9 +220,25 @@ class DataConnectionTest {
     }
 
     @Test
-    fun testUpdateWithId() {
+    fun testUpsertWhenNoItemExistsWithId() {
         DataConnection.doAndClose {
+            val toy = Toy(toyOneUuid, toyOneName)
 
+            it.upsert(toy)
+
+            val query = Query(Toy.TABLE_NAME, null, null, null, null, null)
+
+            val savedToy = it.findFirst(Toy.BUILDER, query)
+
+            assertNotNull(savedToy)
+            assertEquals(toyOneUuid, savedToy?.uuid)
+            assertEquals(toyOneName, savedToy?.name)
+        }
+    }
+
+    @Test
+    fun testUpsertWhenItemWithIdAlreadyExists() {
+        DataConnection.doAndClose {
             val toy = Toy(toyOneUuid, toyOneName)
 
             it.insert(toy)
@@ -236,7 +253,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneUuid, toyTwoName)
 
-            it.updateForColumn(toyTwo, Toy.UUID, toyTwo.uuid)
+            it.upsert(toyTwo)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 
@@ -250,8 +267,7 @@ class DataConnectionTest {
     }
 
     @Test
-    fun testUpdateWithColumn() {
-
+    fun testUpdate() {
         DataConnection.doAndClose {
 
             val toy = Toy(toyOneUuid, toyOneName)
@@ -268,7 +284,7 @@ class DataConnectionTest {
 
             val toyTwo = Toy(toyOneUuid, toyTwoName)
 
-            it.updateForColumn(toyTwo, Toy.UUID, toyOneUuid)
+            it.update(toyTwo)
 
             val updatedToy = it.findFirst(Toy.BUILDER, query)
 

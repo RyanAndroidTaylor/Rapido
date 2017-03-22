@@ -20,7 +20,7 @@ data class PetToToy(val petUuid: String,
         val PET_UUID = Column(String::class.java, "PetUuid")
         val TOY_UUID = Column(String::class.java, "ToyUuid")
 
-        val COLUMNS = arrayOf(PET_UUID, TOY_UUID)
+        val COLUMNS = arrayOf(PET_UUID, TOY_UUID, UUID)
     }
 
     override fun tableName() = TABLE_NAME
@@ -29,5 +29,5 @@ data class PetToToy(val petUuid: String,
 
     override fun idColumn() = UUID
 
-    override fun contentValues() = ContentValues().addAll(COLUMNS, uuid, petUuid, toyUuid)
+    override fun contentValues() = ContentValues().addAll(COLUMNS, petUuid, toyUuid, uuid)
 }

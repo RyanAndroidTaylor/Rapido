@@ -119,7 +119,7 @@ class QueryBuilderTest {
 
         assertEquals(query.tableName, Toy.TABLE_NAME)
 
-        assertEquals(3, query.columns?.size)
+        assertEquals(Toy.COLUMNS.size, query.columns?.size)
         assertEquals(Toy.UUID.name, query.columns?.get(0))
         assertEquals(Toy.NAME.name, query.columns?.get(1))
 

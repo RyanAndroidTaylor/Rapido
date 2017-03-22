@@ -149,7 +149,7 @@ class DataConnection private constructor(val database: SQLiteDatabase) {
     fun updateForColumn(item: DataTable, column: Column, value: Any) {
         val columnValue = when (value) {
             is String -> value
-            is Int, is Long -> value.toString()
+            is Int, is Long, is Float, is Double -> value.toString()
             is Boolean -> if (value) "1" else "0"
             else -> throw IllegalArgumentException("String, Int, Long and Boolean are the only supported types. You passed ${value.javaClass}")
         }

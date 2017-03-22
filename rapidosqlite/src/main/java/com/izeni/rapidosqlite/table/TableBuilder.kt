@@ -13,6 +13,7 @@ class TableBuilder {
     // Types
     val TEXT = "TEXT"
     val INTEGER = "INTEGER"
+    val REAL = "REAL"
     val BOOLEAN = "INTEGER"
     val BLOB = "BLOB"
 
@@ -55,6 +56,7 @@ class TableBuilder {
         when (column.type) {
             String::class.java -> return buildTextColumn(column.name)
             Int::class.java, Long::class.java -> return buildIntColumn(column.name)
+            Float::class.java, Double::class.java -> return buildRealColumn(column.name)
             Boolean::class.java -> return buildBooleanColumn(column.name)
             else -> throw UnsupportedOperationException("No ColumnBuilder found for type ${column.type}")
         }
@@ -87,6 +89,10 @@ class TableBuilder {
 
     private fun buildIntColumn(columnName: String): ColumnBuilder {
         return ColumnBuilder().appendInt(columnName)
+    }
+
+    private fun buildRealColumn(columnName: String): ColumnBuilder {
+        return ColumnBuilder().appendReal(columnName)
     }
 
     private fun buildBooleanColumn(columnName: String): ColumnBuilder {
@@ -135,6 +141,14 @@ class TableBuilder {
             this.columnName = columnName
 
             type = INTEGER
+
+            return this
+        }
+
+        fun appendReal(columnName: String): ColumnBuilder {
+            this.columnName = columnName
+
+            type = REAL
 
             return this
         }
@@ -200,7 +214,7 @@ class TableBuilder {
                 }
 
                 when (it) {
-                    is String, is Int, is Long -> createString.append(it)
+                    is String, is Int, is Long, is Float, is Double -> createString.append(it)
                     is Boolean -> createString.append(if (it) 1 else 0)
                     else -> throw IllegalArgumentException("Default value must be of type String, Int, Long or Boolean. Default value type is ${it.javaClass}")
                 }

@@ -50,7 +50,7 @@ class QueryBuilder private constructor() {
     private fun addToSelectionArgs(value: Any) {
         when (value) {
             is String -> selectionArgs.add(value)
-            is Int, is Long -> selectionArgs.add(value.toString())
+            is Int, is Long, is Float, is Double -> selectionArgs.add(value.toString())
             is Boolean -> selectionArgs.add(if (value) "1" else "0")
             else -> throw IllegalArgumentException("whereEquals only supports String, Int, Long and Boolean. value passed was $value")
         }

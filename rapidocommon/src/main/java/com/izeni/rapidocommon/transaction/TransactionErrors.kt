@@ -14,6 +14,8 @@ interface DialogError : Error {
     val title: String
 }
 
+class LogError(override val message: String) : Error
+
 class ThrowableError(val throwable: Throwable?) : Error {
     override val message = throwable?.message ?: "N/A"
 }

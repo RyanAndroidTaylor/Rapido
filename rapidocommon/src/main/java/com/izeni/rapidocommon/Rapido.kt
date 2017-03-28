@@ -25,6 +25,5 @@ object Rapido {
     fun init(context: Context) {
         SharedPref.setPrefContext(context)
         NetworkProvider.setNetworkContext(context)
-        TransactionErrorHandler.init(context)
     }
 }

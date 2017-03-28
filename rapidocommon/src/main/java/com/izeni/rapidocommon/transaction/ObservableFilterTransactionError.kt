@@ -7,7 +7,7 @@ import io.reactivex.disposables.Disposable
 /**
  * Created by ner on 11/20/16.
  */
-class ObservableFilterTransactionError<T, P>() : ObservableOperator<Transaction<T, P>, Transaction<T, P>> {
+class ObservableFilterTransactionError<T, P> : ObservableOperator<Transaction<T, P>, Transaction<T, P>> {
     override fun apply(observer: Observer<in Transaction<T, P>>?): Observer<in Transaction<T, P>> {
         return Op(observer)
     }

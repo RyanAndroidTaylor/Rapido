@@ -8,11 +8,13 @@ import java.util.*
  */
 class QueryBuilder private constructor() {
     private val EQUALS = " =? "
+    private val NOT_EQUALS = " !=? "
     private val LESS_THAN = " <? "
     private val LESS_THAN_OR_EQUAL = " <=? "
     private val GREATER_THAN = " >? "
     private val GREATER_THAN_OR_EQUAL = " >=? "
     private val LIKE = " LIKE ?"
+    private val NOT_LIKE = " NOT LIKE? "
     private val OR = " OR "
     private val AND = " AND "
     private val ASCENDING = "ASC"
@@ -102,6 +104,10 @@ class QueryBuilder private constructor() {
         return where(column, value, EQUALS)
     }
 
+    fun whereNotEquals(column: Column, value: Any): QueryBuilder {
+        return where(column, value, NOT_EQUALS)
+    }
+
     fun whereLessThan(column: Column, value: Any): QueryBuilder {
         return where(column, value, LESS_THAN)
     }
@@ -128,6 +134,18 @@ class QueryBuilder private constructor() {
 
     fun endsWith(column: Column, value: Any): QueryBuilder {
         return where(column, "%$value", LIKE)
+    }
+
+    fun doesNotContain(column: Column, value: Any): QueryBuilder {
+        return where(column, "%$value%", NOT_LIKE)
+    }
+
+    fun doesNotStartWith(column: Column, value: Any): QueryBuilder {
+        return where(column, "$value%", NOT_LIKE)
+    }
+
+    fun doesNotEndsWith(column: Column, value: Any): QueryBuilder {
+        return where(column, "%$value", NOT_LIKE)
     }
 
     fun or(): QueryBuilder {

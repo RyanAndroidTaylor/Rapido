@@ -44,7 +44,7 @@ class TableBuilder {
 
             column.defaultValue?.let { columnBuilder.defaultValue(it) }
 
-            column.foreignKey?.let { columnBuilder.foreignKey(it.first, it.second.name) }
+            column.foreignKey?.let { columnBuilder.foreignKey(it.tableName, it.column) }
 
             columnBuilder.build()
         }
@@ -175,8 +175,8 @@ class TableBuilder {
             return this
         }
 
-        fun foreignKey(tableName: String, columnName: String): ColumnBuilder {
-            foreignKeys.add("FOREIGN KEY (" + this.columnName + ") " + REFERENCES + tableName + "(" + columnName + ")")
+        fun foreignKey(tableName: String, column: Column): ColumnBuilder {
+            foreignKeys.add("FOREIGN KEY (${this.columnName}) $REFERENCES+$tableName(${column.name})")
 
             return this
         }

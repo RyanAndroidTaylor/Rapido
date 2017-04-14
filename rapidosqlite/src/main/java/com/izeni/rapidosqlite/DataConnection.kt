@@ -10,7 +10,6 @@ import android.util.Log
 import com.izeni.rapidosqlite.item_builder.ItemBuilder
 import com.izeni.rapidosqlite.query.Query
 import com.izeni.rapidosqlite.query.RawQuery
-import com.izeni.rapidosqlite.table.Column
 import com.izeni.rapidosqlite.table.DataTable
 import com.izeni.rapidosqlite.table.ParentDataTable
 import io.reactivex.BackpressureStrategy

@@ -207,12 +207,6 @@ class TableBuilder {
             defaultValue?.let {
                 createString.append(DEFAULT)
 
-                when (1) {
-                    1 -> ""
-                    2 -> ""
-                    3 -> ""
-                }
-
                 when (it) {
                     is String, is Int, is Long, is Float, is Double -> createString.append(it)
                     is Boolean -> createString.append(if (it) 1 else 0)

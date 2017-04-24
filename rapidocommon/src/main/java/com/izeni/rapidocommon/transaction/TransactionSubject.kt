@@ -1,7 +1,9 @@
 package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.filterNetworkErrors
+import com.izeni.rapidocommon.whenNull
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -20,9 +22,9 @@ open class TransactionSubject<T, P> {
     private var doOnLoading: ((P?) -> Unit)? = null
     private var doOnSuccess: ((T) -> Unit)? = null
     private var doOnError: ((Error) -> Unit)? = null
-    private var doOnSubscribe: (() -> Unit)? = null
+    private var doOnSubscribe: ((TransactionSubject<T, P>) -> Unit)? = null
 
-    private var subscribeOn = DEFAULT
+    private var subscribeScheduler: Scheduler? = null
 
     open fun onIdle() {
         if (!subject.hasComplete()) {
@@ -72,44 +74,46 @@ open class TransactionSubject<T, P> {
         doOnSuccess = block
     }
 
-    fun doOnSubscribe(block: () -> Unit): TransactionSubject<T, P> {
+    fun doOnSubscribe(block: (TransactionSubject<T, P>) -> Unit): TransactionSubject<T, P> {
         this.doOnSubscribe = block
 
         return this
     }
 
-    fun subscribeOnIo() : TransactionSubject<T, P> {
-        subscribeOn = IO
+    fun subscribeOn(scheduler: Scheduler): TransactionSubject<T, P> {
+        subscribeScheduler = scheduler
 
         return this
     }
 
-    fun subscribeOnComputation() : TransactionSubject<T, P> {
-        subscribeOn = COMPUTATION
+    fun subscribeOnIo(): TransactionSubject<T, P> {
+        subscribeScheduler = Schedulers.io()
+
+        return this
+    }
+
+    fun subscribeOnComputation(): TransactionSubject<T, P> {
+        subscribeScheduler = Schedulers.computation()
 
         return this
     }
 
     fun subject(): Observable<Transaction<T, P>> {
         val observable = subject.filterNetworkErrors()
-                .doOnSubscribe { doOnSubscribe?.invoke() }
+                .doOnSubscribe { doOnSubscribe?.invoke(this) }
 
-        when (subscribeOn) {
-            IO -> return observable.subscribeOn(Schedulers.io())
-            COMPUTATION -> return observable.subscribeOn(Schedulers.computation())
-            else -> return observable
-        }
+        subscribeScheduler?.let { return observable.subscribeOn(it) }
+
+        return observable
     }
 
     fun mainThreadSubject(): Observable<Transaction<T, P>> {
         val observable = subject.filterNetworkErrors()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { doOnSubscribe?.invoke() }
+                .doOnSubscribe { doOnSubscribe?.invoke(this) }
 
-        when (subscribeOn) {
-            IO -> return observable.subscribeOn(Schedulers.io())
-            COMPUTATION -> return observable.subscribeOn(Schedulers.computation())
-            else -> return observable
-        }
+        subscribeScheduler?.let { return observable.subscribeOn(it) }
+
+        return observable
     }
 }

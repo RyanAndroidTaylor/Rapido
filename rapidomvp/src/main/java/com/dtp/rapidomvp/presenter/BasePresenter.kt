@@ -11,25 +11,25 @@ open class BasePresenter<V : ViewLayer> : Presenter<V> {
 
     override var view: V? = null
 
-    private val subscriptions = CompositeDisposable()
-    private val fullSubscriptions = CompositeDisposable()
+    private val shortSubscriptions = CompositeDisposable()
+    private val longSubscriptions = CompositeDisposable()
 
     override fun unSubscribe() {
         super.unSubscribe()
 
-        subscriptions.clear()
+        shortSubscriptions.clear()
     }
 
     override fun destroy() {
         super.destroy()
 
-        fullSubscriptions.clear()
+        longSubscriptions.clear()
     }
 
-    fun addSubscription(disposable: Disposable, fullSubscription: Boolean = true) {
-        if (fullSubscription)
-            fullSubscriptions.add(disposable)
+    protected fun addSubscription(disposable: Disposable, longSubscription: Boolean = true) {
+        if (longSubscription)
+            longSubscriptions.add(disposable)
         else
-            subscriptions.add(disposable)
+            shortSubscriptions.add(disposable)
     }
 }

@@ -17,7 +17,7 @@ object TransactionErrorHandler {
         this.context = context
     }
 
-    fun dettach(context: Activity) {
+    fun detach(context: Activity) {
         if (this.context == context)
             this.context = null
     }

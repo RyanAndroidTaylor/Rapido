@@ -69,6 +69,8 @@ fun String.unescape(): String = this.replace("""\/""", "/")
 
 fun String?.nullSafe(default: String = ""): String = if (this == null) default else this
 
+inline fun <T> T.ifNotNull(block: (T) -> Unit): T { block(this); return this }
+
 inline fun whenNull(block: () -> Unit) { block() }
 
 inline fun <T> T?.ifNull(block: () -> Unit) {

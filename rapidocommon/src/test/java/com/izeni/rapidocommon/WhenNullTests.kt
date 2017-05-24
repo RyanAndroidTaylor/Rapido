@@ -14,47 +14,47 @@ class WhenNullTests {
     @Test
     @Throws(Exception::class)
     fun testNull() {
-        var letBlockWasRun = false
+        var ifNotNullBlockWasRun = false
         var whenNullBlockWasRun = false
 
         val testVariable: String? = null
 
-        testVariable?.let {
-            letBlockWasRun = true
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
         } ?: whenNull {
             whenNullBlockWasRun = true
         }
 
-        assertFalse(letBlockWasRun)
+        assertFalse(ifNotNullBlockWasRun)
         assertTrue(whenNullBlockWasRun)
     }
 
     @Test
     fun testNotNull() {
-        var letBlockWasRun = false
+        var ifNotNullBlockWasRun = false
         var whenNullBlockWasRun = false
 
         val testVariable: String? = "Something"
 
-        testVariable?.let {
-            letBlockWasRun = true
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
         } ?: whenNull {
             whenNullBlockWasRun = true
         }
 
         assertFalse(whenNullBlockWasRun)
-        assertTrue(letBlockWasRun)
+        assertTrue(ifNotNullBlockWasRun)
     }
 
     @Test
     fun testNotNullEndWithNoReturnMethod() {
-        var letBlockWasRun = false
+        var ifNotNullBlockWasRun = false
         var whenNullBlockWasRun = false
 
         val testVariable: String? = "Something"
 
-        testVariable?.let {
-            letBlockWasRun = true
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
 
             noReturnMethod()
         } ?: whenNull {
@@ -62,18 +62,18 @@ class WhenNullTests {
         }
 
         assertFalse(whenNullBlockWasRun)
-        assertTrue(letBlockWasRun)
+        assertTrue(ifNotNullBlockWasRun)
     }
 
     @Test
     fun testNotNullEndWithReturnNotNullMethod() {
-        var letBlockWasRun = false
+        var ifNotNullBlockWasRun = false
         var whenNullBlockWasRun = false
 
         val testVariable: String? = "Something"
 
-        testVariable?.let {
-            letBlockWasRun = true
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
 
             returnNotNullMethod()
         } ?: whenNull {
@@ -81,26 +81,45 @@ class WhenNullTests {
         }
 
         assertFalse(whenNullBlockWasRun)
-        assertTrue(letBlockWasRun)
+        assertTrue(ifNotNullBlockWasRun)
     }
 
     @Test
     fun testNotNullEndWithReturnNullMethod() {
-        var letBlockWasRun = false
+        var ifNotNullBlockWasRun = false
         var whenNullBlockWasRun = false
 
         val testVariable: String? = "Something"
 
-        testVariable?.let {
-            letBlockWasRun = true
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
 
             returnNullMethod()
         } ?: whenNull {
             whenNullBlockWasRun = true
         }
 
-        assertTrue(whenNullBlockWasRun)
-        assertTrue(letBlockWasRun)
+        assertFalse(whenNullBlockWasRun)
+        assertTrue(ifNotNullBlockWasRun)
+    }
+
+    @Test
+    fun endsWithNull() {
+        var ifNotNullBlockWasRun = false
+        var whenNullBlockWasRun = false
+
+        val testVariable: String? = "Something"
+
+        testVariable?.ifNotNull {
+            ifNotNullBlockWasRun = true
+
+            null
+        } ?: whenNull {
+            whenNullBlockWasRun = true
+        }
+
+        assertFalse(whenNullBlockWasRun)
+        assertTrue(ifNotNullBlockWasRun)
     }
 
     private fun noReturnMethod() {

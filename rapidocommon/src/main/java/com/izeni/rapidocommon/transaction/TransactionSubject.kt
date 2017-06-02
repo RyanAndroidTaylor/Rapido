@@ -1,54 +1,44 @@
 package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.filterNetworkErrors
-import io.reactivex.Observable
 import io.reactivex.Scheduler
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.ReplaySubject
 
 /**
  * Created by ner on 2/28/17.
  */
 open class TransactionSubject<T, P> {
-    protected val subject: BehaviorSubject<Transaction<T, P>> = BehaviorSubject.create()
+    protected val subject: ReplaySubject<Transaction<T, P>> = ReplaySubject.create()
 
     private val doOnIdleItems = mutableListOf<() -> Unit>()
     private val doOnProgressItems = mutableListOf<(P?) -> Unit>()
     private val doOnSuccessItems = mutableListOf<(T) -> Unit>()
     private val doOnErrorItems = mutableListOf<(Error) -> Unit>()
-    private val doOnSubscribeItems = mutableListOf<(TransactionSubject<T, P>) -> Unit>()
+    private var runOnSubscribe: ((TransactionSubject<T, P>) -> Unit)? = null
 
     open fun onIdle() {
         if (!subject.hasComplete()) {
-            doOnIdleItems.forEach { it.invoke() }
-
             subject.onNext(Transaction.Idle<T, P>())
         }
     }
 
-    open fun onLoading(progress: P? = null) {
+    open fun onProgress(progress: P? = null) {
         if (!subject.hasComplete()) {
-            doOnProgressItems.forEach { it.invoke(progress) }
-
-            subject.onNext(Transaction.Loading(progress))
+            subject.onNext(Transaction.Progress(progress))
         }
     }
 
     open fun onSuccess(item: T) {
         if (!subject.hasComplete()) {
-            doOnSuccessItems.forEach { it.invoke(item) }
-
             subject.onNext(Transaction.Success(item))
         }
     }
 
     open fun onError(error: Error) {
         if (!subject.hasComplete()) {
-            doOnErrorItems.forEach { it.invoke(error) }
-
             subject.onNext(Transaction.Failure<T, P>(error))
         }
     }
@@ -77,14 +67,28 @@ open class TransactionSubject<T, P> {
         return this
     }
 
+    fun runOnSubscribed(block: (TransactionSubject<T, P>) -> Unit): TransactionSubject<T, P> {
+        runOnSubscribe = block
+
+        return this
+    }
+
     fun subscribe(subscribeOn: Scheduler? = null, observeOn: Scheduler? = null): Disposable {
         var observable = subject.filterNetworkErrors()
 
         observeOn?.let { observable = observable.observeOn(observeOn) }
 
-        observable = observable.doOnSubscribe { doOnSubscribeItems.forEach { it.invoke(this) } }
+        observable = observable.doOnSubscribe { runOnSubscribe?.invoke(this) }
+                .doOnNext {
+                    when (it) {
+                        is Transaction.Idle -> doOnIdleItems.forEach { item -> item.invoke() }
+                        is Transaction.Progress -> doOnProgressItems.forEach { item -> item.invoke(it.progress) }
+                        is Transaction.Success -> doOnSuccessItems.forEach { item -> item.invoke(it.value) }
+                        is Transaction.Failure -> doOnErrorItems.forEach { item -> item.invoke(it.error) }
+                    }
+                }
 
-        subscribeOn?.let { observable = observable.subscribeOn(it) }
+        subscribeOn?.let { return observable.subscribeOn(subscribeOn).subscribe() }
 
         return observable.subscribe()
     }

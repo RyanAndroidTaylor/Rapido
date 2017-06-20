@@ -22,12 +22,12 @@ object TransactionErrorHandler {
             this.context = null
     }
 
-    fun handleError(error: Error) {
+    fun handleError(error: TransactionError) {
         context?.let {
             Handler(it.mainLooper).post {
                 when (error) {
-                    is ToastError -> showToast(error.message)
-                    is DialogError -> showDialog(error.title, error.message)
+                    is ToastError -> showToast(error.message ?: "Message not specified")
+                    is DialogError -> showDialog(error.title ?: "", error.message ?: "Message not specified")
                     is MessageError -> showToast(error.message)
                     is LogError -> e(error.message)
                     else -> throw IllegalArgumentException("Error type not supported $error")

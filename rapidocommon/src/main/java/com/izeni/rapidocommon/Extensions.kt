@@ -2,11 +2,10 @@
 
 package com.izeni.rapidocommon
 
-import com.izeni.rapidocommon.transaction.TransactionErrorHandler
-import com.izeni.rapidocommon.transaction.ObservableFilterTransactionError
-import com.izeni.rapidocommon.transaction.Transaction
+import com.izeni.rapidocommon.transaction.*
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -40,7 +39,7 @@ import android.support.v4.app.Fragment as SupportFragment
  **/
 
 fun <T> Observable<T>.onMain(subScheduler: Scheduler? = null): Observable<T> =
-        (if(subScheduler != null) this.subscribeOn(subScheduler) else this).observeOn(AndroidSchedulers.mainThread())
+        (if (subScheduler != null) this.subscribeOn(subScheduler) else this).observeOn(AndroidSchedulers.mainThread())
 
 fun <T> Observable<T>.watchOnMain(watcher: (T) -> Unit): Disposable =
         onMain().doOnNext(watcher).onErrorResumeNext({ t: Throwable -> Observable.empty<T>() }).subscribe()
@@ -51,12 +50,12 @@ fun runOnIo(block: () -> Unit): Disposable {
             .subscribe({ block() })
 }
 
-fun <T, P> Observable<Transaction<T, P>>.filterNetworkErrors(): Observable<Transaction<T, P>> {
+fun <T> Observable<Transaction<T>>.filterNetworkErrors(): Observable<Transaction<T>> {
     return lift(ObservableFilterTransactionError())
 }
 
-fun String?.prepend(prepend: String) = if(isNullOrEmpty()) "" else "$prepend$this"
-fun String?.append(append: String) = if(isNullOrEmpty()) "" else "$this$append"
+fun String?.prepend(prepend: String) = if (isNullOrEmpty()) "" else "$prepend$this"
+fun String?.append(append: String) = if (isNullOrEmpty()) "" else "$this$append"
 
 fun String?.isNothing(): Boolean {
     val strLen: Int? = this?.length
@@ -69,9 +68,16 @@ fun String.unescape(): String = this.replace("""\/""", "/")
 
 fun String?.nullSafe(default: String = ""): String = if (this == null) default else this
 
-inline fun <T> T.ifNotNull(block: (T) -> Unit): T { block(this); return this }
+inline fun <T> T?.ifNotNull(block: (T) -> Unit): T? {
+    if (this != null)
+        block(this)
 
-inline fun whenNull(block: () -> Unit) { block() }
+    return this
+}
+
+inline fun whenNull(block: () -> Unit) {
+    block()
+}
 
 inline fun <T> T?.ifNull(block: () -> Unit) {
     if (this == null)
@@ -84,9 +90,9 @@ inline infix fun Any?.isNotNull(if_true: (Any) -> Unit) {
 
 class ResettableLazyManager {
     val managedDelegates = LinkedList<Resettable>()
-    private var preReset: ((LinkedList<Resettable>)->Boolean)? = null
+    private var preReset: ((LinkedList<Resettable>) -> Boolean)? = null
 
-    fun addPreResetListener(preReset: ((LinkedList<Resettable>)->Boolean)?): ResettableLazyManager {
+    fun addPreResetListener(preReset: ((LinkedList<Resettable>) -> Boolean)?): ResettableLazyManager {
         this.preReset = preReset
         return this
     }
@@ -130,3 +136,7 @@ class ResettableLazy<T>(val manager: ResettableLazyManager, val init: () -> T) :
 fun <T> resettableLazy(manager: ResettableLazyManager, init: () -> T): ResettableLazy<T> {
     return ResettableLazy(manager, init)
 }
+
+fun <T> Observable<Transaction<T>>.toTransactionObservable(): TransactionObservable<T> = TransactionObservable(this)
+
+//fun <T> Single<T>.toTransactionObservable(): TransactionObservable<T> = TransactionObservable(this)

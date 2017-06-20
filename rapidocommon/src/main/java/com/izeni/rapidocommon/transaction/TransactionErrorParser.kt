@@ -2,25 +2,24 @@ package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.e
 import retrofit2.Response
-import java.util.*
 import kotlin.collections.HashMap
 
 /**
  * Created by ner on 11/21/16.
  */
 object TransactionErrorParser {
-    private val errors = HashMap<String, Error>()
-    private val throwableErrors = HashMap<Throwable, Error>()
+    private val errors = HashMap<String, TransactionError>()
+    private val throwableErrors = HashMap<Throwable, TransactionError>()
 
-    fun registerError(errorMessage: String, error: Error) {
+    fun registerError(errorMessage: String, error: TransactionError) {
         errors.put(errorMessage, error)
     }
 
-    fun registerError(throwable: Throwable, error: Error) {
+    fun registerError(throwable: Throwable, error: TransactionError) {
         throwableErrors.put(throwable, error)
     }
 
-    fun parseError(throwable: Throwable?): Error {
+    fun parseError(throwable: Throwable?): TransactionError {
         throwable?.let {
             if (throwableErrors.containsKey(throwable))
                 return throwableErrors[throwable] ?: ThrowableError(throwable)
@@ -29,8 +28,8 @@ object TransactionErrorParser {
         return ThrowableError(throwable)
     }
 
-    fun parseError(errorCode: String?, errorMessage: String?, errorBody: String?): Error {
-        var error: Error? = null
+    fun parseError(errorCode: String?, errorMessage: String?, errorBody: String?): TransactionError {
+        var error: TransactionError? = null
 
         if (errors.containsKey(errorBody))
             error = errors[errorBody]
@@ -52,8 +51,8 @@ object TransactionErrorParser {
         return error
     }
 
-    fun <T> parseRetrofitError(response: Response<T>): Error {
-        var error: Error? = null
+    fun <T> parseRetrofitError(response: Response<T>): TransactionError {
+        var error: TransactionError? = null
 
         if (errors.containsKey(response.errorBody()?.string()))
             error = errors[response.errorBody()?.string()]

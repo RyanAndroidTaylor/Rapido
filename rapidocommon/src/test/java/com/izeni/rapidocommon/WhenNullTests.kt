@@ -20,8 +20,12 @@ class WhenNullTests {
         val testVariable: String? = null
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
+
             ifNotNullBlockWasRun = true
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 
@@ -37,8 +41,12 @@ class WhenNullTests {
         val testVariable: String? = "Something"
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
+
             ifNotNullBlockWasRun = true
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 
@@ -54,10 +62,13 @@ class WhenNullTests {
         val testVariable: String? = "Something"
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
             ifNotNullBlockWasRun = true
 
             noReturnMethod()
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 
@@ -73,10 +84,14 @@ class WhenNullTests {
         val testVariable: String? = "Something"
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
+
             ifNotNullBlockWasRun = true
 
             returnNotNullMethod()
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 
@@ -92,10 +107,14 @@ class WhenNullTests {
         val testVariable: String? = "Something"
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
+
             ifNotNullBlockWasRun = true
 
             returnNullMethod()
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 
@@ -111,10 +130,14 @@ class WhenNullTests {
         val testVariable: String? = "Something"
 
         testVariable?.ifNotNull {
+            assertNotNull(testVariable)
+
             ifNotNullBlockWasRun = true
 
             null
         } ?: whenNull {
+            assertNull(testVariable)
+
             whenNullBlockWasRun = true
         }
 

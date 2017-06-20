@@ -3,13 +3,14 @@ package com.izeni.rapidocommon.transaction
 /**
  * Created by ner on 10/31/16.
  */
-sealed class Transaction<T, P> {
+sealed class Transaction<T> {
 
-    class Idle<T, P> : Transaction<T, P>()
+    companion object {
+        fun <T> success(item: T): Transaction<T> = Success(item)
+        fun <T> error(error: TransactionError): Transaction<T> = Failure(error)
+    }
 
-    class Progress<T, P>(val progress: P? = null) : Transaction<T, P>()
+    class Success<T>(val value: T) : Transaction<T>()
 
-    class Success<T, P>(val value: T) : Transaction<T, P>()
-
-    class Failure<T, P>(val error: Error) : Transaction<T, P>()
+    class Failure<T>(val error: TransactionError) : Transaction<T>()
 }

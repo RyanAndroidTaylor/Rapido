@@ -7,21 +7,24 @@ import io.reactivex.disposables.Disposable
 /**
  * Created by ner on 11/20/16.
  */
-class ObservableFilterTransactionError<T, P> : ObservableOperator<Transaction<T, P>, Transaction<T, P>> {
-    override fun apply(observer: Observer<in Transaction<T, P>>?): Observer<in Transaction<T, P>> {
+class ObservableFilterTransactionError<T> : ObservableOperator<Transaction<T>, Transaction<T>> {
+    override fun apply(observer: Observer<in Transaction<T>>?): Observer<in Transaction<T>> {
         return Op(observer)
     }
 
 
-    inner class Op(val child: Observer<in Transaction<T, P>>?) : Observer<Transaction<T, P>>, Disposable {
+    inner class Op(val child: Observer<in Transaction<T>>?) : Observer<Transaction<T>>, Disposable {
 
         var disposable: Disposable? = null
 
-        override fun onNext(t: Transaction<T, P>) {
-            if (t is Transaction.Failure<*, *>)
+        override fun onNext(t: Transaction<T>) {
+            if (t is Transaction.Failure) {
                 TransactionErrorHandler.handleError(t.error)
 
-            child?.onNext(t)
+                child?.onNext(t)
+            } else {
+                child?.onNext(t)
+            }
         }
 
         override fun onSubscribe(d: Disposable?) {
@@ -39,7 +42,7 @@ class ObservableFilterTransactionError<T, P> : ObservableOperator<Transaction<T,
 
             TransactionErrorHandler.handleError(error)
 
-            child?.onNext(Transaction.Failure<T, P>(error))
+            child?.onNext(Transaction.Failure<T>(error))
         }
 
         override fun isDisposed(): Boolean {

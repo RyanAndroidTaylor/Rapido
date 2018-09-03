@@ -5,12 +5,7 @@ package com.izeni.rapidocommon.transaction
  */
 sealed class Transaction<T> {
 
-    companion object {
-        fun <T> success(item: T): Transaction<T> = Success(item)
-        fun <T> error(error: TransactionError): Transaction<T> = Failure(error)
-    }
-
     class Success<T>(val value: T) : Transaction<T>()
 
-    class Failure<T>(val error: TransactionError) : Transaction<T>()
+    class Failure<T>(val error: Throwable?) : Transaction<T>()
 }

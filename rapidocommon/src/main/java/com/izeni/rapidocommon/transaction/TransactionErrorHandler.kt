@@ -22,15 +22,14 @@ object TransactionErrorHandler {
             this.context = null
     }
 
-    fun handleError(error: TransactionError) {
+    fun handleError(error: Throwable?) {
         context?.let {
             Handler(it.mainLooper).post {
                 when (error) {
-                    is ToastError -> showToast(error.message ?: "Message not specified")
-                    is DialogError -> showDialog(error.title ?: "", error.message ?: "Message not specified")
-                    is MessageError -> showToast(error.message)
-                    is LogError -> e(error.message)
-                    else -> throw IllegalArgumentException("Error type not supported $error")
+                    is LogThrowable -> e(error.message)
+                    is ToastThrowable -> showToast(error.message ?: "Message not specified")
+                    is DialogThrowable -> showDialog(error.title, error.message ?: "Message not specified")
+                    else -> error?.printStackTrace()
                 }
             }
         }
@@ -50,3 +49,15 @@ object TransactionErrorHandler {
         }
     }
 }
+
+class LogThrowable(message: String): Throwable(message)
+
+class ToastThrowable(message: String): Throwable(message)
+
+class DialogThrowable(val title: String, message: String): Throwable(message)
+
+fun throwLogMessage(message: String): Nothing = throw LogThrowable(message)
+
+fun throwToastMessage(message: String): Nothing = throw ToastThrowable(message)
+
+fun throwDialogMessage(title: String, message: String): Nothing = throw DialogThrowable(title, message)

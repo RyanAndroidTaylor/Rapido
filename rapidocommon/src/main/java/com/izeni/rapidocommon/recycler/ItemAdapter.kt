@@ -14,17 +14,14 @@ abstract class ItemAdapter<T>(val items: MutableList<T>,
                               val viewHolder: (View) -> ViewHolder<T>) :
         RecyclerView.Adapter<ViewHolder<T>>() {
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
+    override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ViewHolder<T>, position: Int) {
         holder.bind(items[position])
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> {
-        return viewHolder(parent.inflate(layoutId))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<T> =
+            viewHolder(parent.inflate(layoutId))
 
     open fun addItem(item: T) {
         items.add(item)

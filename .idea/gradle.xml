@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/rapidocommon" />
             <option value="$PROJECT_DIR$/rapidomvp" />
+            <option value="$PROJECT_DIR$/rapidomvvm" />
             <option value="$PROJECT_DIR$/rapidosqlite" />
           </set>
         </option>

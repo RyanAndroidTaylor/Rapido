@@ -1,24 +1,24 @@
 package com.izeni.rapidocommon.transaction
 
-import io.reactivex.ObservableOperator
-import io.reactivex.Observer
+import io.reactivex.SingleObserver
+import io.reactivex.SingleOperator
 import io.reactivex.disposables.Disposable
 
 /**
- * Created by ner on 11/20/16.
+ * Created by ner on 7/10/17.
  */
-class ObservableFilterTransactionError<T> : ObservableOperator<Transaction<T>, T> {
-    override fun apply(observer: Observer<in Transaction<T>>?): Observer<in T> {
+class SingleFilterError<T> : SingleOperator<Transaction<T>, T> {
+    override fun apply(observer: SingleObserver<in Transaction<T>>?): SingleObserver<in T> {
         return Op(observer)
     }
 
 
-    inner class Op(val child: Observer<in Transaction<T>>?) : Observer<T>, Disposable {
+    inner class Op(val child: SingleObserver<in Transaction<T>>?) : SingleObserver<T>, Disposable {
 
         var disposable: Disposable? = null
 
-        override fun onNext(t: T) {
-            child?.onNext(Transaction.Success(t))
+        override fun onSuccess(value: T) {
+            child?.onSuccess(Transaction.Success(value))
         }
 
         override fun onSubscribe(d: Disposable?) {
@@ -27,14 +27,10 @@ class ObservableFilterTransactionError<T> : ObservableOperator<Transaction<T>, T
             child?.onSubscribe(d)
         }
 
-        override fun onComplete() {
-            child?.onComplete()
-        }
-
         override fun onError(t: Throwable?) {
             TransactionErrorHandler.handleError(t)
 
-            child?.onNext(Transaction.Failure<T>(t))
+            child?.onSuccess(Transaction.Failure<T>(t))
         }
 
         override fun isDisposed(): Boolean {

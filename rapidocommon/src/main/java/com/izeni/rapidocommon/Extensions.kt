@@ -9,7 +9,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.LinkedList
+import java.util.*
 import kotlin.reflect.KProperty
 import android.support.v4.app.Fragment as SupportFragment
 
@@ -50,8 +50,12 @@ fun runOnIo(block: () -> Unit): Disposable {
             .subscribe({ block() })
 }
 
-fun <T> Observable<Transaction<T>>.filterNetworkErrors(): Observable<Transaction<T>> {
+fun <T> Observable<T>.filterNetworkErrors(): Observable<Transaction<T>> {
     return lift(ObservableFilterTransactionError())
+}
+
+fun <T> Single<T>.filterNetworkErrors(): Single<Transaction<T>> {
+    return lift(SingleFilterError())
 }
 
 fun String?.prepend(prepend: String) = if (isNullOrEmpty()) "" else "$prepend$this"
@@ -136,7 +140,3 @@ class ResettableLazy<T>(val manager: ResettableLazyManager, val init: () -> T) :
 fun <T> resettableLazy(manager: ResettableLazyManager, init: () -> T): ResettableLazy<T> {
     return ResettableLazy(manager, init)
 }
-
-fun <T> Observable<Transaction<T>>.toTransactionObservable(): TransactionObservable<T> = TransactionObservable(this)
-
-//fun <T> Single<T>.toTransactionObservable(): TransactionObservable<T> = TransactionObservable(this)

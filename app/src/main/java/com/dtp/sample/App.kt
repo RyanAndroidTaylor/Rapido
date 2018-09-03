@@ -3,8 +3,6 @@ package com.dtp.sample
 import android.app.Application
 import com.dtp.sample.common.database.DatabaseOpenHelper
 import com.facebook.stetho.Stetho
-import com.izeni.rapidocommon.transaction.OutOfRoomError
-import com.izeni.rapidocommon.transaction.TransactionErrorParser
 import com.izeni.rapidosqlite.DataConnection
 
 /**

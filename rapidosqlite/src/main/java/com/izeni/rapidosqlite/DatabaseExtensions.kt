@@ -1,4 +1,4 @@
-package com.izeni.rapidosqlite
+epackage com.izeni.rapidosqlite
 
 import android.content.ContentValues
 import android.database.Cursor

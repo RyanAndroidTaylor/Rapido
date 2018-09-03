@@ -1,38 +1,38 @@
 package com.izeni.rapidocommon.transaction
 
 import com.izeni.rapidocommon.filterNetworkErrors
-import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 /**
- * Created by ner on 6/9/17.
+ * Created by ner on 7/10/17.
  */
-class TransactionObservable<T>(val observable: Observable<T>) {
+class TransactionSingle<T>(val single: Single<T>) {
 
     private val doOnSuccessItems = mutableListOf<(T) -> Unit>()
     private val doOnErrorItems = mutableListOf<(Throwable?) -> Unit>()
 
-    fun watchSuccesses(block: (T) -> Unit): TransactionObservable<T> {
+    fun watchSuccesses(block: (T) -> Unit): TransactionSingle<T> {
         doOnSuccessItems.add(block)
 
         return this
     }
 
-    fun watchErrors(block: (Throwable?) -> Unit): TransactionObservable<T> {
+    fun watchErrors(block: (Throwable?) -> Unit): TransactionSingle<T> {
         doOnErrorItems.add(block)
 
         return this
     }
 
     fun subscribe(subscribeOn: Scheduler? = null, observeOn: Scheduler? = null): Disposable {
-        var observable = this.observable.filterNetworkErrors()
+        var observable = this.single.filterNetworkErrors()
 
         observeOn?.let { observable = observable.observeOn(observeOn) }
 
-        observable = observable.doOnNext {
+        observable = observable.doOnSuccess {
             when (it) {
                 is Transaction.Success -> doOnSuccessItems.forEach { item -> item.invoke(it.value) }
                 is Transaction.Failure -> doOnErrorItems.forEach { item -> item.invoke(it.error) }
@@ -53,4 +53,4 @@ class TransactionObservable<T>(val observable: Observable<T>) {
     }
 }
 
-fun <T> Observable<T>.toTransactionObservable(): TransactionObservable<T> = TransactionObservable(this)
+fun <T> Single<T>.toTransactionSingle(): TransactionSingle<T> = TransactionSingle(this)

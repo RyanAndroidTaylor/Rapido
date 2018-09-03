@@ -1,1 +1,1 @@
-include ':app', ':rapidomvp', ':rapidosqlite', ':rapidocommon'
+include ':app', ':rapidomvp', ':rapidosqlite', ':rapidocommon', ':rapidomvvm'
